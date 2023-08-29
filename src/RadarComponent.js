@@ -1,49 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import "./App.css";
-/* 
-const data = [
-    {
-        label: "1",
-        innerRadius: 0.5,
-        outerRadius: 0.9,
-        startAngle: 10,
-        endAngle: 35,
-        color: "rgba(199, 0, 57, 0.7)",
-    },
-    {
-        label: "2",
-        innerRadius: 0.15,
-        outerRadius: 0.66,
-        startAngle: 20,
-        endAngle: 189,
-        color: "rgba(5, 0, 57, 0.7)",
-    },
-    {
-        label: "3",
-        innerRadius: 0.25,
-        outerRadius: 0.96,
-        startAngle: 120,
-        endAngle: 360,
-        color: "rgba(88, 0, 57, 0.7)",
-    }
-];
-
-const pointsData = [
-    {
-        angle: 3,
-        radius: 0.8,
-        elevation: 5,
-        color: "green",
-    },
-    {
-        angle: 90,
-        radius: 0.7,
-        elevation: 5,
-        color: "blue",
-    },
-];
- */
 
 function generateBaseCircles(numCircles, color) {
   const baseCircles = [];
@@ -141,6 +98,7 @@ function RadarComponent({
       .append("path")
       .attr("d", path)
       .attr("fill", (d) => (d.selected ? d.data.color : "transparent"))
+      .style("cursor", "pointer")
       .attr("stroke", "white")
       .attr("stroke-width", 2);
 
@@ -148,19 +106,19 @@ function RadarComponent({
       .append("rect") // Agregar rectángulo como fondo de la etiqueta
       .attr("x", (d) => {
         const centroid = path.centroid(d);
-        return centroid[0] - 15; // Ajusta la posición en x
+        return centroid[0] - 14.7; // Ajusta la posición en x
       })
       .attr("y", (d) => {
         const centroid = path.centroid(d);
-        return centroid[1] - 15; // Ajusta la posición en y
+        return centroid[1] - 14; // Ajusta la posición en y
       })
       .attr("width", 20) // Ancho del rectángulo
       .attr("height", 20) // Altura del rectángulo
-      .attr("fill", "rgb(255, 255, 255)") // Color del fondo
+      .attr("fill", "white") // Color del fondo -- En caso de estar seleccionado debe ser verde
       .attr("rx", 4) // Radio horizontal de las esquinas
-      .attr("ry", 4)
-      .attr("stroke", "white")
-      .attr("stroke-width", 2); // Radio vertical de las esquinas
+      .style("cursor", "pointer")
+      .attr("stroke", "white") // En caso de estar seleccionado debe ser negro
+      .attr("stroke-width", 0.7);; // Radio vertical de las esquinas
 
     sections
       .append("text")
@@ -172,37 +130,70 @@ function RadarComponent({
       .attr("dy", "0.1em")
       .attr("dx", "-0.3em")
       .text((d) => d.data.label)
+      .style("cursor", "pointer")
       .style("text-anchor", "middle")
       .style("font-size", "16px")
       .style("font-weight", "bold")
       .style("fill", "rgb(72, 207, 135)");
 
-    const points = svg
-      .selectAll(".point")
-      .data(data.targets)
+    ///////////////////////
+
+    const pathPoint = d3
+      .arc()
+      .outerRadius((d) => d.data.radius * radius) // En caso de que venga un valor de 0 a 1, se multiplica por el radio maximo para que sea porcentual
+      .innerRadius((d) => d.data.radius * radius)
+      .startAngle((d) => d.data.angle * (Math.PI / 180)) // Se convierte de Grados a Radianes
+      .endAngle((d) => d.data.angle * (Math.PI / 180)); // Se convierte de Grados a Radianes
+
+    const point = svg
+      .selectAll(".arc")
+      .data(pie(data.targets))
       .enter()
-      .append("g")
-      .attr("class", "point")
-      .attr(
-        "transform",
-        (d) => `translate(100, ${-d.radius * Math.sin(d.angle)})`
-      );
+      .append("g");
+    //.attr(
+    //    "class",
+    //    (d, i) => `arc ${data.selected ? "selected" : ""}`
+    //);
 
-    points
-      .append("circle")
-      .attr("cx", (d) => d.angle)
-      .attr("cy", (d) => d.radius * radius)
-      .attr("r", 5)
-      .attr("fill", (d) => d.color);
+    point
+      .append("path")
+      .attr("d", pathPoint)
+      .attr("fill", (d) => (d.selected ? d.data.color : "transparent"))
+      .attr("stroke", "white")
+      .attr("stroke-width", 2);
 
-    points
+    point
+      .append("rect") // Agregar rectángulo como fondo de la etiqueta
+      .attr("x", (d) => {
+        const centroid = pathPoint.centroid(d);
+        return centroid[0] - 11.5; // Ajusta la posición en x
+      })
+      .attr("y", (d) => {
+        const centroid = pathPoint.centroid(d);
+        return centroid[1] - 11.5; // Ajusta la posición en y
+      })
+      .attr("width", 23) // Ancho del rectángulo
+      .attr("height", 23) // Altura del rectángulo
+      .attr("fill", "white") // Color del fondo -- En caso de estar seleccionado debe ser del color que tiene el target
+      .attr("rx", 12) // Radio horizontal de las esquinas
+      .attr("ry", 12)
+      .style("cursor", "pointer")
+      .attr("stroke", "white") //-- En caso de estar seleccionado debe ser verde
+      .attr("stroke-width", 0.7); // Radio vertical de las esquinas
+
+    point
       .append("text")
-      .attr("x", 10) // Ajusta la posición en x
-      .attr("dy", "0.35em")
-      .text((d) => d.label) // Utiliza la propiedad label para el texto
-      .style("text-anchor", "start")
+      .attr("transform", (d) => {
+        const centroid = pathPoint.centroid(d);
+        return `translate(${centroid})`;
+      })
+      .attr("dy", "0.34em")
+      .attr("dx", "0em")
+      .text((d) => d.data.label)
+      .style("text-anchor", "middle")
       .style("font-size", "16px")
       .style("font-weight", "bold")
+      .style("cursor", "pointer")
       .style("fill", "rgb(72, 207, 135)");
 
     sections.on("click", handleClick);

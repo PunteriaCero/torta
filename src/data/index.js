@@ -66,39 +66,16 @@ export const data = {
       selected: false,
 
       value: 10,
-    },
-    {
-      label: "7",
-
-      startAngle: 200,
-
-      endAngle: 200,
-
-      innerRadius: 0.5,
-
-      outerRadius: 0.5,
-
-      startElevation: 4,
-
-      endElevation: 6,
-
-      color: "black",
-
-      selected: false,
-
-      value: 10,
-    },
-
-    
+    },    
   ],
 
   targets: [
     // {label, angle, radius, elevation, color, selected},
 
     {
-      label: "TARGET",
+      label: "22",
 
-      angle: 3,
+      angle: 300,
 
       radius: 0.8,
 
@@ -107,10 +84,10 @@ export const data = {
       color: "rgb(207, 207, 207)",
 
       selected: false,
-    },/* {
-      label: "pepe",
+    }, {
+      label: "8",
 
-      angle: 300,
+      angle: 30,
 
       radius: 0.2,
 
@@ -120,7 +97,7 @@ export const data = {
 
       selected: false,
     },{
-      label: "flala",
+      label: "24",
 
       angle: 200,
 
@@ -131,6 +108,18 @@ export const data = {
       color: "rgb(6, 207, 207)",
 
       selected: false,
-    }, */
+    },{
+      label: "0",
+
+      angle: 0,
+
+      radius: 0,
+
+      elevation: 5,
+
+      color: "rgb(6, 207, 207)",
+
+      selected: false,
+    }, 
   ],
 };
