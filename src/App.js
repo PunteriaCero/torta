@@ -4,7 +4,7 @@ import { data } from "./data";
 
 function App() {
   return (
-    <div className="App" style={{backgroundColor: "black"}}>
+    <div className="App" style={{backgroundColor: "darkgray"}}>
       <RadarComponent data={data}/>
     </div>
   );
