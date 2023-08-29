@@ -72,35 +72,31 @@ function App() {
   // ];
   const data = [
     {
-      label: "Section 1",
-      value: 30,
-      radius: 0.9,
-      color: "rgba(255, 87, 51, 0.7)",
-    },
-    {
-      label: "Section 2",
-      value: 20,
-      radius: 0.85,
+      label: "Prueba 1",
+      innerRadius: 0.5,
+      outerRadius: 0.9,
+      startAngle: 10,
+      endAngle: 35,
       color: "rgba(199, 0, 57, 0.7)",
     },
     {
-      label: "Section 3",
-      value: 15,
-      radius: 0.8,
-      color: "rgba(144, 12, 63, 0.7)",
+      label: "Prueba 2",      
+      innerRadius: 0.15,
+      outerRadius: 0.66,
+      startAngle: 20,
+      endAngle: 189,
+      color: "rgba(5, 0, 57, 0.7)",
     },
     {
-      label: "Section 4",
-      value: 10,
-      radius: 0.75,
-      color: "rgba(88, 24, 69, 0.7)",
-    },
-    {
-      label: "Section 5",
-      value: 25,
-      radius: 0.7,
-      color: "rgba(255, 195, 0, 0.7)",
-    },
+      label: "Prueba 3",      
+      innerRadius: 0.25,
+      outerRadius: 0.96,
+      startAngle: 120,
+      endAngle: 360,
+      color: "rgba(88, 0, 57, 0.7)",
+    }
+
+    
   ];
 
   const pointsData = [
@@ -116,6 +112,18 @@ function App() {
       elevation: 5,
       color: "blue",
     },
+  ];
+
+  const baseCircles = [
+    { radius: 0.01, color: "green" },
+    { radius: 0.125, color: "green" },
+    { radius: 0.250, color: "green" },
+    { radius: 0.375, color: "green" },
+    { radius: 0.500, color: "green" },
+    { radius: 0.625, color: "green" },    
+    { radius: 0.750, color: "green" },
+    { radius: 0.875, color: "green" },    
+    { radius: 1, color: "green" },
   ];
 
   const chartRef = useRef(null);
@@ -136,15 +144,12 @@ function App() {
       .value((d) => d.value)
       .sort(null);
 
-    // const path = d3
-    //   .arc()
-    //   .outerRadius((d) => d.data.outerRadius)
-    //   .innerRadius((d) => d.data.innerRadius);
-
     const path = d3
       .arc()
-      .outerRadius((d) => d.data.radius * (radius - 10))
-      .innerRadius((d) => d.data.radius * 50);
+      .outerRadius((d) => d.data.outerRadius * radius) // En caso de que venga un valor de 0 a 1, se multiplica por el radio maximo para que sea porcentual
+      .innerRadius((d) => d.data.innerRadius * radius)
+      .startAngle((d) => (d.data.startAngle) * (Math.PI / 180)) // Se convierte de Grados a Radianes
+      .endAngle((d) => (d.data.endAngle) * (Math.PI / 180)); // Se convierte de Grados a Radianes
 
     const sections = svg
       .selectAll(".arc")
@@ -196,6 +201,36 @@ function App() {
       sections.select("path").attr("d", path);
     }
 
+    const base = svg.append("g").attr("class", "base");
+
+    baseCircles.forEach((circle) => {
+      base
+        .append("circle")
+        .attr("cx", 0)
+        .attr("cy", 0)
+        .attr("r", circle.radius * radius)
+        .attr("stroke", circle.color)
+        .attr("stroke-width", 1)
+        .attr("fill", "none");
+    });
+
+// Agregar líneas desde el centro hasta el radio máximo en intervalos de 30 grados
+const numLines = 12; // 360 grados / 30 grados = 12 líneas
+for (let i = 0; i < numLines; i++) {
+  const angle = (i * 30 * Math.PI) / 180; // Convertir a radianes
+  const x2 = Math.cos(angle) * radius; // Coordenada x del final de la línea
+  const y2 = Math.sin(angle) * -radius; // Coordenada y del final de la línea (negativo para invertir el eje y)
+
+  svg.append("line")
+    .attr("x1", 0)             // Coordenada x del inicio de la línea (centro)
+    .attr("y1", 0)             // Coordenada y del inicio de la línea (centro)
+    .attr("x2", x2)            // Coordenada x del final de la línea
+    .attr("y2", y2)            // Coordenada y del final de la línea
+    .attr("stroke", "green")   // Color de la línea (verde)
+    .attr("stroke-width", 1)   // Ancho de la línea
+    .attr("opacity", 0.2);     // Opacidad para un aspecto más suave
+}
+
     return () => {
       svg.selectAll("*").remove(); // Elimina los elementos del SVG al desmontar el componente
     };
@@ -207,6 +242,7 @@ function App() {
 
   return (
     <div className="App">
+      <span>N</span>
       <div id="chart" ref={chartRef}>
         <svg ref={svgRef}></svg>
       </div>
