@@ -25,10 +25,15 @@ function RadarComponent({
   opacity = 0.4,
 }) {
   const [selectedSection, setSelectedSection] = useState(null);
-  const handleClick = (event, d, i) => {
-    console.log(d);
-    setSelectedSection(d.data);
-    d.data.selected = true;
+  const [sectionsData, setSectionsData] = useState(data.sections);
+
+  const handleClick = (event, d) => {
+    console.log("click", d, sectionsData);
+    const newSectionsData = sectionsData.map((value) => ({
+      ...value,
+      selected: value.label === d.data.label ? true : false,
+    }));
+    setSectionsData(newSectionsData);
     onClick(d.data);
   };
 
@@ -90,19 +95,14 @@ function RadarComponent({
 
     const sections = svg
       .selectAll(".arc")
-      .data(pie(data.sections))
+      .data(pie(sectionsData))
       .enter()
       .append("g");
-    //.attr(
-    //    "class",
-    //    (d, i) => `arc ${data.selected ? "selected" : ""}`
-    //);
-
     sections
       .append("path")
       .attr("d", path)
       .attr("fill", (d) => (d.data.color))
-      .attr("fill-opacity", opacity)
+      .attr("fill-opacity", (d) => (d.data.selected ? "white" : opacity))
       .style("cursor", "pointer")
       .attr("stroke", (d) => (d.data.color))
       .attr("stroke-width", 2);
@@ -123,7 +123,8 @@ function RadarComponent({
       .attr("rx", 4) // Radio horizontal de las esquinas
       .style("cursor", "pointer")
       .attr("stroke", "white") // En caso de estar seleccionado debe ser negro
-      .attr("stroke-width", 0.7);; // Radio vertical de las esquinas
+      .attr("stroke-width", 0.7); // Radio vertical de las esquinas
+    // .attr("class", (d, i) => `arc ${data.selected ? "selected" : ""}`);
 
     sections
       .append("text")
@@ -139,8 +140,7 @@ function RadarComponent({
       .style("text-anchor", "middle")
       .style("font-size", "16px")
       .style("font-weight", "bold")
-      .style("fill", "rgb(72, 207, 135)");
-
+      .style("fill", (d, i) => "rgb(72, 207, 135)");
     ///////////////////////
 
     const pathPoint = d3
@@ -206,7 +206,7 @@ function RadarComponent({
     return () => {
       svg.selectAll("*").remove(); // Elimina los elementos del SVG al desmontar el componente
     };
-  }, [selectedSection]);
+  }, [sectionsData]);
 
   return (
     <>
