@@ -116,7 +116,7 @@ function RadarComponent({
       .arc()
       .outerRadius((d) => d.data.outerRadius * radius) // En caso de que venga un valor de 0 a 1, se multiplica por el radio maximo para que sea porcentual
       .innerRadius((d) => d.data.innerRadius * radius)
-      .startAngle((d) => d.data.startAngle * (Math.PI / 180)) // Se convierte de Grados a Radianes
+      .startAngle((d) => d.data.startAngle > d.data.endAngle ? ((d.data.startAngle - 360) * (Math.PI / 180)) : (d.data.startAngle * (Math.PI / 180)) ) // Se convierte de Grados a Radianes
       .endAngle((d) => d.data.endAngle * (Math.PI / 180)); // Se convierte de Grados a Radianes
 
     const sections = svg

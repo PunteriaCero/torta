@@ -5,7 +5,7 @@ export const data = {
     {
       label: "1",
 
-      startAngle: -10,
+      startAngle: 325,
 
       endAngle: 30,
 
