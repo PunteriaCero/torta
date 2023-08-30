@@ -273,6 +273,6 @@ RadarComponent.defaultProps = {
     northColor: "green",
     sectionOpacity: 0.4,
   },
-};
+}; 
 
 export default RadarComponent;
