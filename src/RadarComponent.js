@@ -15,16 +15,19 @@ function generateBaseCircles(numCircles, color) {
 
 function RadarComponent({
   data,
+  onClick, 
   radius = 200,
   numCircles = 9,
   colorCircles = "green",
   numLines = 24,
   colorLines = "green",
   north = "N",
+  opacity = 0.4,
 }) {
   const [selectedSection, setSelectedSection] = useState(null);
   const handleClick = (event, d, i) => {
-    setSelectedSection(d.data.index);
+    console.log(d);
+    setSelectedSection(d.data);
     d.data.selected = true;
   };
 
@@ -97,9 +100,10 @@ function RadarComponent({
     sections
       .append("path")
       .attr("d", path)
-      .attr("fill", (d) => (d.selected ? d.data.color : "transparent"))
+      .attr("fill", (d) => (d.data.color))
+      .attr("fill-opacity", opacity)
       .style("cursor", "pointer")
-      .attr("stroke", "white")
+      .attr("stroke", (d) => (d.data.color))
       .attr("stroke-width", 2);
 
     sections

@@ -5,7 +5,7 @@ export const data = {
     {
       label: "1",
 
-      startAngle: 0,
+      startAngle: -10,
 
       endAngle: 30,
 
@@ -17,7 +17,7 @@ export const data = {
 
       endElevation: 6,
 
-      color: "rgb(25, 138, 78)",
+      color: "red",
 
       selected: true,
 
@@ -29,19 +29,19 @@ export const data = {
 
       startAngle: 90,
 
-      endAngle: 180,
+      endAngle: 221,
 
       innerRadius: 0,
 
-      outerRadius: 0.5,
+      outerRadius: 0.55,
 
       startElevation: 4,
 
       endElevation: 6,
 
-      color: "rgb(101, 101, 101)",
+      color: "gray",
 
-      selected: false,
+      selected: true,
 
       value: 10,
     },
@@ -61,9 +61,9 @@ export const data = {
 
       endElevation: 6,
 
-      color: "rgb(101, 101, 101)",
+      color: "orange",
 
-      selected: false,
+      selected: true,
 
       value: 10,
     },    
@@ -111,9 +111,9 @@ export const data = {
     },{
       label: "0",
 
-      angle: 0,
+      angle: 190,
 
-      radius: 0,
+      radius: 0.5,
 
       elevation: 5,
 
