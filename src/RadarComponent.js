@@ -102,27 +102,28 @@ function RadarComponent({
       .append("path")
       .attr("d", path)
       .attr("fill", (d) => (d.data.color))
-      .attr("fill-opacity", (d) => (d.data.selected ? "white" : opacity))
+      .attr("fill-opacity", opacity)
       .style("cursor", "pointer")
-      .attr("stroke", (d) => (d.data.color))
+      .style('filter', (d) => (d.data.selected ? "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.6))" : "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))"))
+      .attr("stroke", (d) => (d.data.selected ? "white" : d.data.color))
       .attr("stroke-width", 2);
 
     sections
       .append("rect") // Agregar rectángulo como fondo de la etiqueta
       .attr("x", (d) => {
         const centroid = path.centroid(d);
-        return centroid[0] - 14.7; // Ajusta la posición en x
+        return centroid[0] - 11.5; // Ajusta la posición en x
       })
       .attr("y", (d) => {
         const centroid = path.centroid(d);
-        return centroid[1] - 14; // Ajusta la posición en y
+        return centroid[1] - 11; // Ajusta la posición en y
       })
-      .attr("width", 20) // Ancho del rectángulo
-      .attr("height", 20) // Altura del rectángulo
-      .attr("fill", "white") // Color del fondo -- En caso de estar seleccionado debe ser verde
+      .attr("width", radius * 0.08) // Ancho del rectángulo
+      .attr("height", radius * 0.08) // Altura del rectángulo
+      .attr("fill", (d) => (d.data.selected ? d.data.color : "white")) // Color del fondo -- En caso de estar seleccionado debe ser verde
       .attr("rx", 4) // Radio horizontal de las esquinas
       .style("cursor", "pointer")
-      .attr("stroke", "white") // En caso de estar seleccionado debe ser negro
+      .attr("stroke", (d) => (d.data.selected ? "black" : "white")) // En caso de estar seleccionado debe ser negro
       .attr("stroke-width", 0.7); // Radio vertical de las esquinas
     // .attr("class", (d, i) => `arc ${data.selected ? "selected" : ""}`);
 
@@ -138,9 +139,9 @@ function RadarComponent({
       .text((d) => d.data.label)
       .style("cursor", "pointer")
       .style("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "12px")
       .style("font-weight", "bold")
-      .style("fill", (d, i) => "rgb(72, 207, 135)");
+      .style("fill", (d, i) => (d.data.selected ? "whitesmoke" : "rgb(100,100,100)"));
     ///////////////////////
 
     const pathPoint = d3
@@ -171,20 +172,22 @@ function RadarComponent({
       .append("rect") // Agregar rectángulo como fondo de la etiqueta
       .attr("x", (d) => {
         const centroid = pathPoint.centroid(d);
-        return centroid[0] - 11.5; // Ajusta la posición en x
+        return centroid[0] - 3; // Ajusta la posición en x
       })
       .attr("y", (d) => {
         const centroid = pathPoint.centroid(d);
-        return centroid[1] - 11.5; // Ajusta la posición en y
+        return centroid[1] - 3; // Ajusta la posición en y
       })
-      .attr("width", 23) // Ancho del rectángulo
-      .attr("height", 23) // Altura del rectángulo
-      .attr("fill", "white") // Color del fondo -- En caso de estar seleccionado debe ser del color que tiene el target
+      .attr("width", radius * 0.03) // Ancho del rectángulo
+      .attr("height", radius * 0.03) // Altura del rectángulo      
+      .style('filter', (d) => (d.data.selected ? `drop-shadow(0px 0px 3px ${d.data.color})` : "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))"))
+      .attr("fill-opacity", (d) => (d.data.selected ? "1" : "0.7"))
+      .attr("fill", (d) => (d.data.color)) // Color del fondo -- En caso de estar seleccionado debe ser del color que tiene el target
       .attr("rx", 12) // Radio horizontal de las esquinas
       .attr("ry", 12)
       .style("cursor", "pointer")
-      .attr("stroke", "white") //-- En caso de estar seleccionado debe ser verde
-      .attr("stroke-width", 0.7); // Radio vertical de las esquinas
+      .attr("stroke", (d) => (d.data.selected ?  "white" : d.data.color)) //-- En caso de estar seleccionado debe ser verde
+      .attr("stroke-width", 1.4); // Radio vertical de las esquinas
 
     point
       .append("text")
@@ -193,13 +196,13 @@ function RadarComponent({
         return `translate(${centroid})`;
       })
       .attr("dy", "0.34em")
-      .attr("dx", "0em")
+      .attr("dx", "0.6em")
       .text((d) => d.data.label)
-      .style("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "12px")
+      .style("text-shadow", "0 0 1px black, 0 0 1px black")
       .style("font-weight", "bold")
       .style("cursor", "pointer")
-      .style("fill", "rgb(72, 207, 135)");
+      .style("fill", "whitesmoke");
 
     sections.on("click", handleClick);
 
@@ -211,7 +214,7 @@ function RadarComponent({
   return (
     <>
       <span>{north}</span>
-      <div id="chart" ref={chartRef}>
+      <div id="chart" ref={chartRef} >
         <svg ref={svgRef}></svg>
       </div>
     </>

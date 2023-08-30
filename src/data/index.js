@@ -19,7 +19,7 @@ export const data = {
 
       color: "red",
 
-      selected: true,
+      selected: false,
 
       value: 10,
     },
@@ -63,7 +63,7 @@ export const data = {
 
       color: "orange",
 
-      selected: true,
+      selected: false,
 
       value: 10,
     },    
@@ -75,13 +75,13 @@ export const data = {
     {
       label: "22",
 
-      angle: 300,
+      angle: 320,
 
-      radius: 0.8,
+      radius: 0.4,
 
       elevation: 5,
 
-      color: "rgb(207, 207, 207)",
+      color: "lightgreen",
 
       selected: false,
     }, {
@@ -93,7 +93,7 @@ export const data = {
 
       elevation: 5,
 
-      color: "rgb(200, 207, 207)",
+      color: "darkcyan",
 
       selected: false,
     },{
@@ -105,9 +105,9 @@ export const data = {
 
       elevation: 5,
 
-      color: "rgb(6, 207, 207)",
+      color: "green",
 
-      selected: false,
+      selected: true,
     },{
       label: "0",
 
@@ -117,7 +117,7 @@ export const data = {
 
       elevation: 5,
 
-      color: "rgb(6, 207, 207)",
+      color: "violet",
 
       selected: false,
     }, 

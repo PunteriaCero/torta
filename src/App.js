@@ -8,8 +8,8 @@ const handleClick = (data) => {
 
 function App() {
   return (
-    <div className="App" style={{backgroundColor: "darkgray"}}>
-      <RadarComponent data={data} onClick={handleClick}/>
+    <div className="App" style={{backgroundColor: "rgb(56, 56, 56)"}}>
+      <RadarComponent data={data} onClick={handleClick} />
     </div>
   );
 }
