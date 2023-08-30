@@ -24,16 +24,42 @@ function RadarComponent({
   north = "N",
   opacity = 0.4,
 }) {
-  const [selectedSection, setSelectedSection] = useState(null);
   const [sectionsData, setSectionsData] = useState(data.sections);
+  const [targetsData, settTargetsData] = useState(data.targets);
 
   const handleClick = (event, d) => {
-    console.log("click", d, sectionsData);
     const newSectionsData = sectionsData.map((value) => ({
       ...value,
       selected: value.label === d.data.label ? true : false,
     }));
+  
+    // Set all targets' selected to false
+    const newTargetsData = targetsData.map((value) => ({
+      ...value,
+      selected: false,
+    }));
+  
     setSectionsData(newSectionsData);
+    settTargetsData(newTargetsData);
+    d.data.selected = true;
+    onClick(d.data);
+  };
+  
+  const handleTargetsClick = (event, d) => {
+    const newTargetsData = targetsData.map((value) => ({
+      ...value,
+      selected: value.label === d.data.label ? true : false,
+    }));
+  
+    // Set all sections' selected to false
+    const newSectionsData = sectionsData.map((value) => ({
+      ...value,
+      selected: false,
+    }));
+  
+    settTargetsData(newTargetsData);
+    setSectionsData(newSectionsData);
+    d.data.selected = true;
     onClick(d.data);
   };
 
@@ -153,7 +179,7 @@ function RadarComponent({
 
     const point = svg
       .selectAll(".arc")
-      .data(pie(data.targets))
+      .data(pie(targetsData))
       .enter()
       .append("g");
     //.attr(
@@ -205,11 +231,12 @@ function RadarComponent({
       .style("fill", "whitesmoke");
 
     sections.on("click", handleClick);
+    point.on("click", handleTargetsClick);
 
     return () => {
       svg.selectAll("*").remove(); // Elimina los elementos del SVG al desmontar el componente
     };
-  }, [sectionsData]);
+  }, [sectionsData, targetsData]);
 
   return (
     <>
