@@ -29,6 +29,7 @@ function RadarComponent({
     console.log(d);
     setSelectedSection(d.data);
     d.data.selected = true;
+    onClick(d.data);
   };
 
   const width = radius * 2;
