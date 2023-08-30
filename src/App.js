@@ -1,17 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import RadarComponent from "./RadarComponent";
-import { data } from "./data";
+import { data, dataDos } from "./data";
 
-const handleClick = (data) => {
-  console.log("Datos recibidos:", data);
-};
+const App = () => {
+  const [currentData, setCurrentData] = useState(data);
 
-function App() {
+  const handleClick = (newData) => {
+    console.log("Datos recibidos:", newData);
+    const spanElement = document.getElementById("dataSpan");
+    spanElement.textContent = "Indice seleccionado: " + newData.label;
+    spanElement.style.color = newData.color;
+  };
+
+  const cambiarDatos = (datos) => {
+    document.getElementById("dataSpan").textContent = "";
+    setCurrentData(datos);
+  };
+
   return (
-    <div className="App" style={{backgroundColor: "rgb(56, 56, 56)"}}>
-      <RadarComponent data={data} onClick={handleClick} />
+    <div className="App" style={{ backgroundColor: "rgb(56, 56, 56)" }}>
+      <RadarComponent key={JSON.stringify(currentData)} data={currentData} onClick={handleClick} />
+      <span id="dataSpan"></span>
+      <br></br>
+      <button onClick={() => cambiarDatos(data)}>Data 1</button>
+      <button onClick={() => cambiarDatos(dataDos)}>Data 2</button>
+      <button onClick={() => cambiarDatos({})}>Limpiar</button>
     </div>
   );
-}
+};
 
 export default App;
