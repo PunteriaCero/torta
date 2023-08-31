@@ -277,5 +277,7 @@ function RadarComponent({ data, onClick, config }) {
     </>
   );
 }
-
+RadarComponent.defaultProps = {
+  config: {},
+};
 export default RadarComponent;

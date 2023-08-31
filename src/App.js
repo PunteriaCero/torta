@@ -45,7 +45,8 @@ const App = () => {
         data={currentData}
 
         onClick={handleClick}
-        config={{}}
+
+        config={{northColor:'violet'}}
 
       />
 
