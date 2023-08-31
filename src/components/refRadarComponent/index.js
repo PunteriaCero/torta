@@ -14,9 +14,10 @@ function RadarComponent({ data, onClick, config }) {
     colorLines = "green",
     north = "N",
     northColor = "rgb(9, 115, 9)",
+    northFontSize = (radius) => (radius*0.06),
     opacity = 0.4,
 
-    sectionLabelFontSize = "12px",
+    sectionLabelFontSize = (radius) => radius * 0.06,
     sectionLabelFontWeight = "bold",
     sectionLabelDefaultColor = "rgb(100, 100, 100)",
     sectionLabelSelectedColor = "whitesmoke",
@@ -24,29 +25,29 @@ function RadarComponent({ data, onClick, config }) {
     unSelectedSectiondropShadowFilter = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))",
     sectionRectWidth = (radius) => radius * 0.08,
     sectionRectHeight = (radius) => radius * 0.08,
-    sectionBorderStroke = 2,
+    sectionBorderStroke = (radius) => radius * 0.01,
     sectionStrokeColor = "white",
-    sectionRecBorderSrtoke = "1",
+    sectionRecBorderSrtoke = (radius) => radius * 0.005,
     unselecteSectionRecColor = "white",
     selectedSectionRecBorderColor = "black",
     unselectedSectionRecBorderColor = "black",
     unSelectedSectionLabelShadow = "drop-shadow(0px 0px 0.7px rgba(0, 0, 0, 1))",
 
-    pointLabelFontSize = "12px",
+    pointLabelFontSize = (radius) => radius * 0.06,
     pointLabelFontWeight = "bold",
     pointLabelTextColor = "whitesmoke",
     pointLabelTextShadow = "0 0 1px black, 0 0 1px black",
-    pointRectWidth = (radius) => radius * 0.03,
-    pointRectHeight = (radius) => radius * 0.03,
+    pointRectWidth = (radius) => radius * 0.04,
+    pointRectHeight = (radius) => radius * 0.04,
     pointBorderStroke = 1.4,
     selectedPointRectborderShadow = (color) =>
       `drop-shadow(0px 0px 3px ${color})`,
     unSelectedPointRectborderShadow = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))",
     selectedPointStrokeColor = "white",
-    pointRectRx = 12,
-    pointRectRy = 12,
+    pointRectRx = (radius) => radius * 0.08,
+    pointRectRy = (radius) => radius * 0.08,
   } = config;
-  
+
   const baseCircles = generateBaseCircles(numCircles, colorCircles);
   const {
     handleSectionClick,
@@ -141,32 +142,33 @@ function RadarComponent({ data, onClick, config }) {
         .attr("stroke", (d) =>
           d.data.selected ? sectionStrokeColor : d.data.color
         )
-        .attr("stroke-width", sectionBorderStroke);
+        .attr("stroke-width", sectionBorderStroke(radius));
 
       // Agregar rectángulos como fondo para las etiquetas de las secciones
       sections
         .append("rect")
         .attr("x", (d) => {
           const centroid = path.centroid(d);
-          return centroid[0] - 11.5;
+          return centroid[0] - (radius * 0.058);
         })
         .attr("y", (d) => {
           const centroid = path.centroid(d);
-          return centroid[1] - 11;
+          return centroid[1] - (radius * 0.054);
         })
         .attr("width", sectionRectWidth(radius))
         .attr("height", sectionRectHeight(radius))
         .attr("fill", (d) =>
           d.data.selected ? unselecteSectionRecColor : d.data.color
         )
-        .attr("rx", 4)
+        .attr("rx",(radius*0.02) )
+        .attr("ry", (radius*0.02))
         .style("cursor", "pointer")
         .attr("stroke", (d) =>
           d.data.selected
             ? selectedSectionRecBorderColor
             : unselectedSectionRecBorderColor
         )
-        .attr("stroke-width", sectionRecBorderSrtoke);
+        .attr("stroke-width", sectionRecBorderSrtoke(radius));
 
       // Agregar elementos de texto para las etiquetas de las secciones
       sections
@@ -180,7 +182,7 @@ function RadarComponent({ data, onClick, config }) {
         .text((d) => d.data.label)
         .style("cursor", "pointer")
         .style("text-anchor", "middle")
-        .style("font-size", sectionLabelFontSize)
+        .style("font-size", sectionLabelFontSize(radius))
         .style("font-weight", sectionLabelFontWeight)
         .style("fill", (d, i) =>
           d.data.selected ? sectionLabelDefaultColor : sectionLabelSelectedColor
@@ -236,8 +238,8 @@ function RadarComponent({ data, onClick, config }) {
         )
         .attr("fill-opacity", (d) => (d.data.selected ? "1" : "0.7"))
         .attr("fill", (d) => d.data.color)
-        .attr("rx", pointRectRx)
-        .attr("ry", pointRectRy)
+        .attr("rx", pointRectRx(radius))
+        .attr("ry", pointRectRy(radius))
         .style("cursor", "pointer")
         .attr("stroke", (d) =>
           d.data.selected ? selectedPointStrokeColor : d.data.color
@@ -252,9 +254,9 @@ function RadarComponent({ data, onClick, config }) {
           return `translate(${centroid})`;
         })
         .attr("dy", "0.34em")
-        .attr("dx", "0.6em")
+        .attr("dx", (radius*0.05))
         .text((d) => d.data.label)
-        .style("font-size", pointLabelFontSize)
+        .style("font-size", pointLabelFontSize(radius))
         .style("text-shadow", pointLabelTextShadow)
         .style("font-weight", pointLabelFontWeight)
         .style("cursor", "pointer")
@@ -273,8 +275,10 @@ function RadarComponent({ data, onClick, config }) {
   return (
     <>
       <div style={styles.body} id="chart">
-        <span style={{ color: northColor }}>{north}</span>
-        <svg ref={svgRef}></svg>
+        <span style={{ color: northColor, fontSize: northFontSize(radius) }}>
+          {north}
+        </span>
+        <svg width="800px" ref={svgRef}></svg>
       </div>
     </>
   );

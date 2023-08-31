@@ -46,7 +46,7 @@ const App = () => {
 
         onClick={handleClick}
 
-        config={{northColor:'violet'}}
+        // config={{northColor:'violet',radius:"200"}}
 
       />
 
