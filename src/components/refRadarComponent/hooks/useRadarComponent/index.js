@@ -8,20 +8,26 @@ export const useRadarComponent = (data, onClick, radius) => {
   const height = width;
 
   useEffect(()=>{
-    sectionsData.sort(compareByEndElevation);
+    if(sectionsData){
+      sectionsData.sort(compareByEndElevation);
+    }
   }, [sectionsData])
-  
+
   useEffect(()=>{
-    targetsData.sort(compareByEndElevation);
+    if(targetsData){
+      targetsData.sort(compareByEndElevation);
+    }
   }, [targetsData])
 
   const updateSelectedState = (dataArray, label) =>
     dataArray.map((data) => ({ ...data, selected: data.label === label }));
 
-  const handleClick = (event, d) => {
+  const handleSectionClick = (event, d) => {
     const newSectionsData = updateSelectedState(sectionsData, d.data.label);
-    const newTargetsData = updateSelectedState(targetsData, null); // Unselect all targets
-    settTargetsData(newTargetsData);
+    if(targetsData){
+      const newTargetsData = updateSelectedState(targetsData, null); // Unselect all targets
+      settTargetsData(newTargetsData);
+    }
     setSectionsData(newSectionsData);
     const newSelectedSection = { ...d.data, selected: true };
     onClick(newSelectedSection);
@@ -29,15 +35,17 @@ export const useRadarComponent = (data, onClick, radius) => {
 
   const handleTargetsClick = (event, d) => {
     const newTargetsData = updateSelectedState(targetsData, d.data.label);
-    const newSectionsData = updateSelectedState(sectionsData, null); // Unselect all sections
+    if(sectionsData){
+      const newSectionsData = updateSelectedState(sectionsData, null); // Unselect all sections
+      setSectionsData(newSectionsData);
+    }
     settTargetsData(newTargetsData);
-    setSectionsData(newSectionsData);
     const newSelectedTarget = { ...d.data, selected: true };
     onClick(newSelectedTarget);
   };
 
   return {
-    handleClick,
+    handleSectionClick,
     handleTargetsClick,
     targetsData,
     sectionsData,

@@ -49,7 +49,7 @@ function RadarComponent({ data, onClick, config }) {
   
   const baseCircles = generateBaseCircles(numCircles, colorCircles);
   const {
-    handleClick,
+    handleSectionClick,
     handleTargetsClick,
     targetsData,
     sectionsData,
@@ -190,7 +190,7 @@ function RadarComponent({ data, onClick, config }) {
         );
 
       // Establecer manejadores de eventos de clic para las secciones y los puntos
-      sections.on("click", handleClick);
+      sections.on("click", handleSectionClick);
     }
     if (targetsData) {
       // Definir un generador de arco para los puntos
