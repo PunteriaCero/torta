@@ -23,3 +23,7 @@ export function BaseCircles({ svg, radius, baseCircles }) {
       .attr("fill", "none");
   });
 }
+
+export function compareByEndElevation(a, b) {
+  return a.endElevation - b.endElevation;
+}

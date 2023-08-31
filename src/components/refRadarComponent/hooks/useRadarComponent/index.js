@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { compareByEndElevation } from "../../utils";
 
 export const useRadarComponent = (data, onClick, radius) => {
   const [sectionsData, setSectionsData] = useState(data.sections);
   const [targetsData, settTargetsData] = useState(data.targets);
   const width = radius * 2;
   const height = width;
+
+  useEffect(()=>{
+    sectionsData.sort(compareByEndElevation);
+  }, [sectionsData])
+  
+  useEffect(()=>{
+    targetsData.sort(compareByEndElevation);
+  }, [targetsData])
 
   const updateSelectedState = (dataArray, label) =>
     dataArray.map((data) => ({ ...data, selected: data.label === label }));

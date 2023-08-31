@@ -46,6 +46,7 @@ function RadarComponent({ data, onClick, config }) {
     pointRectRx = 12,
     pointRectRy = 12,
   } = config;
+  
   const baseCircles = generateBaseCircles(numCircles, colorCircles);
   const {
     handleClick,
@@ -104,6 +105,7 @@ function RadarComponent({ data, onClick, config }) {
       .pie()
       .value((d) => d.value)
       .sort(null);
+
     if (sectionsData) {
       // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
       const sections = svg
