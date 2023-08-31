@@ -29,7 +29,7 @@ function RadarComponent({ data, onClick, config }) {
     sectionRecBorderSrtoke = "1",
     unselecteSectionRecColor = "white",
     selectedSectionRecBorderColor = "black",
-    unselectedSectionRecBorderColor = "white",
+    unselectedSectionRecBorderColor = "black",
     unSelectedSectionLabelShadow = "drop-shadow(0px 0px 0.7px rgba(0, 0, 0, 1))",
 
     pointLabelFontSize = "12px",
@@ -121,7 +121,7 @@ function RadarComponent({ data, onClick, config }) {
           d.data.startAngle > d.data.endAngle
             ? (d.data.startAngle - 360) * (Math.PI / 180)
             : d.data.startAngle * (Math.PI / 180)
-        ) // Se convierte de Grados a Radianes
+        )
         .endAngle((d) => d.data.endAngle * (Math.PI / 180));
 
       // Agregar elementos de tipo "path" para las secciones
