@@ -9,8 +9,8 @@ function RadarComponent({ data, onClick, config }) {
     numCircles = 9,
     colorCircles = "green",
     numLines = 24,
-    opacityLines = 0.1,
-    strokeLines = 2,
+    opacityLines = 0.3,
+    strokeLines = 1,
     colorLines = "green",
     north = "N",
     northColor = "rgb(9, 115, 9)",
@@ -30,6 +30,7 @@ function RadarComponent({ data, onClick, config }) {
     unselecteSectionRecColor = "white",
     selectedSectionRecBorderColor = "black",
     unselectedSectionRecBorderColor = "white",
+    unSelectedSectionLabelShadow = "drop-shadow(0px 0px 0.7px rgba(0, 0, 0, 1))",
 
     pointLabelFontSize = "12px",
     pointLabelFontWeight = "bold",
@@ -116,7 +117,11 @@ function RadarComponent({ data, onClick, config }) {
         .arc()
         .outerRadius((d) => d.data.outerRadius * radius)
         .innerRadius((d) => d.data.innerRadius * radius)
-        .startAngle((d) => d.data.startAngle * (Math.PI / 180))
+        .startAngle((d) =>
+          d.data.startAngle > d.data.endAngle
+            ? (d.data.startAngle - 360) * (Math.PI / 180)
+            : d.data.startAngle * (Math.PI / 180)
+        ) // Se convierte de Grados a Radianes
         .endAngle((d) => d.data.endAngle * (Math.PI / 180));
 
       // Agregar elementos de tipo "path" para las secciones
@@ -177,6 +182,9 @@ function RadarComponent({ data, onClick, config }) {
         .style("font-weight", sectionLabelFontWeight)
         .style("fill", (d, i) =>
           d.data.selected ? sectionLabelDefaultColor : sectionLabelSelectedColor
+        )
+        .style("filter", (d) =>
+          d.data.selected ? "" : unSelectedSectionLabelShadow
         );
 
       // Establecer manejadores de eventos de clic para las secciones y los puntos
