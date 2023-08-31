@@ -14,8 +14,8 @@ export const useRadarComponent = (data, onClick, radius) => {
     const newTargetsData = updateSelectedState(targetsData, null); // Unselect all targets
     settTargetsData(newTargetsData);
     setSectionsData(newSectionsData);
-    d.data.selected = true;
-    onClick(d.data);
+    const newSelectedSection = { ...d.data, selected: true };
+    onClick(newSelectedSection);
   };
 
   const handleTargetsClick = (event, d) => {
@@ -23,8 +23,8 @@ export const useRadarComponent = (data, onClick, radius) => {
     const newSectionsData = updateSelectedState(sectionsData, null); // Unselect all sections
     settTargetsData(newTargetsData);
     setSectionsData(newSectionsData);
-    d.data.selected = true;
-    onClick(d.data);
+    const newSelectedTarget = { ...d.data, selected: true };
+    onClick(newSelectedTarget);
   };
 
   return {

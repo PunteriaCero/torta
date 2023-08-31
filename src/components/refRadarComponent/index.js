@@ -98,158 +98,159 @@ function RadarComponent({ data, onClick, config }) {
         .attr("stroke-width", strokeLines)
         .attr("opacity", opacityLines);
     });
-
     // Crear un generador de pie
     const pie = d3
       .pie()
       .value((d) => d.value)
       .sort(null);
+    if (sectionsData) {
+      // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
+      const sections = svg
+        .selectAll(".arc")
+        .data(pie(sectionsData))
+        .enter()
+        .append("g");
 
-    // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
-    const sections = svg
-      .selectAll(".arc")
-      .data(pie(sectionsData))
-      .enter()
-      .append("g");
+      // Definir un generador de arco para las secciones
+      const path = d3
+        .arc()
+        .outerRadius((d) => d.data.outerRadius * radius)
+        .innerRadius((d) => d.data.innerRadius * radius)
+        .startAngle((d) => d.data.startAngle * (Math.PI / 180))
+        .endAngle((d) => d.data.endAngle * (Math.PI / 180));
 
-    // Definir un generador de arco para las secciones
-    const path = d3
-      .arc()
-      .outerRadius((d) => d.data.outerRadius * radius)
-      .innerRadius((d) => d.data.innerRadius * radius)
-      .startAngle((d) => d.data.startAngle * (Math.PI / 180))
-      .endAngle((d) => d.data.endAngle * (Math.PI / 180));
+      // Agregar elementos de tipo "path" para las secciones
+      sections
+        .append("path")
+        .attr("d", path)
+        .attr("fill", (d) => d.data.color)
+        .attr("fill-opacity", opacity)
+        .style("cursor", "pointer")
+        .style("filter", (d) =>
+          d.data.selected
+            ? selectedSectiondropShadowFilter
+            : unSelectedSectiondropShadowFilter
+        )
+        .attr("stroke", (d) =>
+          d.data.selected ? sectionStrokeColor : d.data.color
+        )
+        .attr("stroke-width", sectionBorderStroke);
 
-    // Agregar elementos de tipo "path" para las secciones
-    sections
-      .append("path")
-      .attr("d", path)
-      .attr("fill", (d) => d.data.color)
-      .attr("fill-opacity", opacity)
-      .style("cursor", "pointer")
-      .style("filter", (d) =>
-        d.data.selected
-          ? selectedSectiondropShadowFilter
-          : unSelectedSectiondropShadowFilter
-      )
-      .attr("stroke", (d) =>
-        d.data.selected ? sectionStrokeColor : d.data.color
-      )
-      .attr("stroke-width", sectionBorderStroke);
+      // Agregar rectángulos como fondo para las etiquetas de las secciones
+      sections
+        .append("rect")
+        .attr("x", (d) => {
+          const centroid = path.centroid(d);
+          return centroid[0] - 11.5;
+        })
+        .attr("y", (d) => {
+          const centroid = path.centroid(d);
+          return centroid[1] - 11;
+        })
+        .attr("width", sectionRectWidth(radius))
+        .attr("height", sectionRectHeight(radius))
+        .attr("fill", (d) =>
+          d.data.selected ? unselecteSectionRecColor : d.data.color
+        )
+        .attr("rx", 4)
+        .style("cursor", "pointer")
+        .attr("stroke", (d) =>
+          d.data.selected
+            ? selectedSectionRecBorderColor
+            : unselectedSectionRecBorderColor
+        )
+        .attr("stroke-width", sectionRecBorderSrtoke);
 
-    // Agregar rectángulos como fondo para las etiquetas de las secciones
-    sections
-      .append("rect")
-      .attr("x", (d) => {
-        const centroid = path.centroid(d);
-        return centroid[0] - 11.5;
-      })
-      .attr("y", (d) => {
-        const centroid = path.centroid(d);
-        return centroid[1] - 11;
-      })
-      .attr("width", sectionRectWidth(radius))
-      .attr("height", sectionRectHeight(radius))
-      .attr("fill", (d) =>
-        d.data.selected ? d.data.color : unselecteSectionRecColor
-      )
-      .attr("rx", 4)
-      .style("cursor", "pointer")
-      .attr("stroke", (d) =>
-        d.data.selected
-          ? selectedSectionRecBorderColor
-          : unselectedSectionRecBorderColor
-      )
-      .attr("stroke-width", sectionRecBorderSrtoke);
+      // Agregar elementos de texto para las etiquetas de las secciones
+      sections
+        .append("text")
+        .attr("transform", (d) => {
+          const centroid = path.centroid(d);
+          return `translate(${centroid})`;
+        })
+        .attr("dy", "0.1em")
+        .attr("dx", "-0.3em")
+        .text((d) => d.data.label)
+        .style("cursor", "pointer")
+        .style("text-anchor", "middle")
+        .style("font-size", sectionLabelFontSize)
+        .style("font-weight", sectionLabelFontWeight)
+        .style("fill", (d, i) =>
+          d.data.selected ? sectionLabelDefaultColor : sectionLabelSelectedColor
+        );
 
-    // Agregar elementos de texto para las etiquetas de las secciones
-    sections
-      .append("text")
-      .attr("transform", (d) => {
-        const centroid = path.centroid(d);
-        return `translate(${centroid})`;
-      })
-      .attr("dy", "0.1em")
-      .attr("dx", "-0.3em")
-      .text((d) => d.data.label)
-      .style("cursor", "pointer")
-      .style("text-anchor", "middle")
-      .style("font-size", sectionLabelFontSize)
-      .style("font-weight", sectionLabelFontWeight)
-      .style("fill", (d, i) =>
-        d.data.selected ? sectionLabelSelectedColor : sectionLabelDefaultColor
-      );
+      // Establecer manejadores de eventos de clic para las secciones y los puntos
+      sections.on("click", handleClick);
+    }
+    if (targetsData) {
+      // Definir un generador de arco para los puntos
+      const pathPoint = d3
+        .arc()
+        .outerRadius((d) => d.data.radius * radius)
+        .innerRadius((d) => d.data.radius * radius)
+        .startAngle((d) => d.data.angle * (Math.PI / 180))
+        .endAngle((d) => d.data.angle * (Math.PI / 180));
 
-    // Definir un generador de arco para los puntos
-    const pathPoint = d3
-      .arc()
-      .outerRadius((d) => d.data.radius * radius)
-      .innerRadius((d) => d.data.radius * radius)
-      .startAngle((d) => d.data.angle * (Math.PI / 180))
-      .endAngle((d) => d.data.angle * (Math.PI / 180));
+      // Seleccionar todos los grupos "arc" y enlazar los datos para los puntos
+      const point = svg
+        .selectAll(".arc")
+        .data(pie(targetsData))
+        .enter()
+        .append("g");
 
-    // Seleccionar todos los grupos "arc" y enlazar los datos para los puntos
-    const point = svg
-      .selectAll(".arc")
-      .data(pie(targetsData))
-      .enter()
-      .append("g");
+      // Agregar elementos de tipo "path" para los puntos
+      point
+        .append("path")
+        .attr("d", pathPoint)
+        .attr("fill", (d) => (d.selected ? d.data.color : "transparent"))
+        .attr("stroke", "white")
+        .attr("stroke-width", 2);
 
-    // Agregar elementos de tipo "path" para los puntos
-    point
-      .append("path")
-      .attr("d", pathPoint)
-      .attr("fill", (d) => (d.selected ? d.data.color : "transparent"))
-      .attr("stroke", "white")
-      .attr("stroke-width", 2);
+      // Agregar rectángulos como fondo para las etiquetas de los puntos
+      point
+        .append("rect")
+        .attr("x", (d) => {
+          const centroid = pathPoint.centroid(d);
+          return centroid[0] - 3;
+        })
+        .attr("y", (d) => {
+          const centroid = pathPoint.centroid(d);
+          return centroid[1] - 3;
+        })
+        .attr("width", pointRectWidth(radius))
+        .attr("height", pointRectHeight(radius))
+        .style("filter", (d) =>
+          d.data.selected
+            ? selectedPointRectborderShadow(d.data.color)
+            : unSelectedPointRectborderShadow
+        )
+        .attr("fill-opacity", (d) => (d.data.selected ? "1" : "0.7"))
+        .attr("fill", (d) => d.data.color)
+        .attr("rx", pointRectRx)
+        .attr("ry", pointRectRy)
+        .style("cursor", "pointer")
+        .attr("stroke", (d) =>
+          d.data.selected ? selectedPointStrokeColor : d.data.color
+        )
+        .attr("stroke-width", pointBorderStroke);
 
-    // Agregar rectángulos como fondo para las etiquetas de los puntos
-    point
-      .append("rect")
-      .attr("x", (d) => {
-        const centroid = pathPoint.centroid(d);
-        return centroid[0] - 3;
-      })
-      .attr("y", (d) => {
-        const centroid = pathPoint.centroid(d);
-        return centroid[1] - 3;
-      })
-      .attr("width", pointRectWidth(radius))
-      .attr("height", pointRectHeight(radius))
-      .style("filter", (d) =>
-        d.data.selected
-          ? selectedPointRectborderShadow(d.data.color)
-          : unSelectedPointRectborderShadow
-      )
-      .attr("fill-opacity", (d) => (d.data.selected ? "1" : "0.7"))
-      .attr("fill", (d) => d.data.color)
-      .attr("rx", pointRectRx)
-      .attr("ry", pointRectRy)
-      .style("cursor", "pointer")
-      .attr("stroke", (d) =>
-        d.data.selected ? selectedPointStrokeColor : d.data.color
-      )
-      .attr("stroke-width", pointBorderStroke);
-
-    // Agregar elementos de texto para las etiquetas de los puntos
-    point
-      .append("text")
-      .attr("transform", (d) => {
-        const centroid = pathPoint.centroid(d);
-        return `translate(${centroid})`;
-      })
-      .attr("dy", "0.34em")
-      .attr("dx", "0.6em")
-      .text((d) => d.data.label)
-      .style("font-size", pointLabelFontSize)
-      .style("text-shadow", pointLabelTextShadow)
-      .style("font-weight", pointLabelFontWeight)
-      .style("cursor", "pointer")
-      .style("fill", pointLabelTextColor);
-
-    // Establecer manejadores de eventos de clic para las secciones y los puntos
-    sections.on("click", handleClick);
-    point.on("click", handleTargetsClick);
+      // Agregar elementos de texto para las etiquetas de los puntos
+      point
+        .append("text")
+        .attr("transform", (d) => {
+          const centroid = pathPoint.centroid(d);
+          return `translate(${centroid})`;
+        })
+        .attr("dy", "0.34em")
+        .attr("dx", "0.6em")
+        .text((d) => d.data.label)
+        .style("font-size", pointLabelFontSize)
+        .style("text-shadow", pointLabelTextShadow)
+        .style("font-weight", pointLabelFontWeight)
+        .style("cursor", "pointer")
+        .style("fill", pointLabelTextColor);
+      point.on("click", handleTargetsClick);
+    }
 
     // Función de limpieza para eliminar todos los elementos del SVG al desmontar el componente
     return () => {
