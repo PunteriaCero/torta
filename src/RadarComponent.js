@@ -275,4 +275,4 @@ RadarComponent.defaultProps = {
   },
 }; 
 
-export default RadarComponent;
+

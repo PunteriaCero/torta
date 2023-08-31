@@ -59,9 +59,11 @@ const App = () => {
 
       <button onClick={() => cambiarDatos({})}>Limpiar</button>
 
+
     </div>
 
   );
+
 
 };
 
