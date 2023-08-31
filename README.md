@@ -20,6 +20,7 @@ This project consists of an interactive data visualization using D3.js and React
 
 - If a section is covered by another, it is not selectable.
 - If a point is in the same position as another, it is not selectable.
+- The label value must be unique.
 
 ## Available Properties
 
@@ -30,7 +31,7 @@ This project consists of an interactive data visualization using D3.js and React
 ## Available Data Properties
 
 - `sections`: sections array(Example Value:`{label, startAngle, endAngle, innerRadius, outerRadius, startElevation, endElevation, color, selected}`).
-	- label:string
+	- label:string(key)
 	- startAngle:number(0-360)
 	- endAngle:number(0-360)
 	- innerRadius:number(0-1)
@@ -41,7 +42,7 @@ This project consists of an interactive data visualization using D3.js and React
 	- selected:boolean
 
 - `targets`: sections array(Example Value:`{label, angle, radius, elevation, color, selected}`).
-	- label:string
+	- label:string(key)
 	- angle:number(0-360)
 	- radius:number(0-1)
 	- elevation:number
