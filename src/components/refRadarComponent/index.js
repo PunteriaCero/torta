@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { generateBaseCircles, BaseCircles } from "./utils";
-import useRadarComponent from "./hooks/useRadarComponent/";
+import useRadarComponent from "./hooks/useRadarComponent";
 
 function RadarComponent({ data, onClick, config }) {
   const {
@@ -89,7 +89,7 @@ function RadarComponent({ data, onClick, config }) {
     // Dibujar líneas desde el centro hasta el radio especificado
     lineAngles.forEach((angle) => {
       const x2 = Math.cos(angle) * radius;
-      const y2 = Math.sin(angle) * -radius;
+      const y2 = Math.sin(angle) * -radius+1.5;
 
       svg
         .append("line")
@@ -275,7 +275,7 @@ function RadarComponent({ data, onClick, config }) {
   return (
     <>
       <div style={styles.body} id="chart">
-        <span style={{ color: northColor, fontSize: northFontSize(radius) }}>
+        <span style={{ color: northColor, fontSize: northFontSize(radius), fontWeight:"bold" }}>
           {north}
         </span>
         <svg width="800px" ref={svgRef}></svg>
