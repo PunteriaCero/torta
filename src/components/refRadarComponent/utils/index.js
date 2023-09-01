@@ -17,9 +17,9 @@ export function BaseCircles({ svg, radius, baseCircles }) {
       .append("circle")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", circle.radius * radius)
+      .attr("r", circle.radius * (radius-3))
       .attr("stroke", circle.color)
-      .attr("stroke-width", 1)
+      .attr("stroke-width", 3)
       .attr("fill", "none");
   });
 }
