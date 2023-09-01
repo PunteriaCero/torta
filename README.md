@@ -56,6 +56,7 @@ This project consists of an interactive data visualization using D3.js and React
 - `radius`: The radius of the main circle in the visualization. (Default value: `200`).
 - `numCircles`: The number of concentric circles in the visualization. (Default value: `9`).
 - `colorCircles`: The color of the concentric circles. (Default value: `"green"`).
+- `circleStroke`: The stroke of the circles. (Default value: `3`).
 - `numLines`: The number of lines originating from the center of the circle. (Default value: `24`).
 - `opacityLines`: The opacity of the lines originating from the center of the circle. (Default value: `0.1`).
 - `strokeLines`: The stroke thickness of the lines originating from the center of the circle. (Default value: `2`).

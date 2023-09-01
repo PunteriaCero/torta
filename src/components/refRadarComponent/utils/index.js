@@ -9,7 +9,7 @@ export function generateBaseCircles(numCircles, color) {
   return baseCircles;
 }
 
-export function BaseCircles({ svg, radius, baseCircles }) {
+export function BaseCircles({ svg, radius, circleStroke, baseCircles }) {
   const base = svg.append("g").attr("class", "base");
 
   baseCircles.forEach((circle) => {
@@ -19,7 +19,7 @@ export function BaseCircles({ svg, radius, baseCircles }) {
       .attr("cy", 0)
       .attr("r", circle.radius * (radius-3))
       .attr("stroke", circle.color)
-      .attr("stroke-width", 3)
+      .attr("stroke-width", circleStroke)
       .attr("fill", "none");
   });
 }
