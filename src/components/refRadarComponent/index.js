@@ -1,65 +1,13 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-import { generateBaseCircles, BaseCircles } from "./utils";
+import { BaseCircles } from "./utils";
 import useRadarComponent from "./hooks/useRadarComponent";
 
 function RadarComponent({ data, onClick, config }) {
-  const {
-    radius = 200,
-    numCircles = 9,
-    colorCircles = "green",
-    numLines = 24,
-    opacityLines = 0.3,
-    strokeLines = 1,
-    colorLines = "green",
-    circleStroke = 3,
-    north = "N",
-    northColor = "rgb(9, 115, 9)",
-    northFontSize = (radius) => (radius*0.06),
-    opacity = 0.4,
-
-    sectionLabelFontSize = (radius) => radius * 0.06,
-    sectionLabelFontWeight = "bold",
-    sectionLabelDefaultColor = "rgb(100, 100, 100)",
-    sectionLabelSelectedColor = "whitesmoke",
-    selectedSectiondropShadowFilter = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.6))",
-    unSelectedSectiondropShadowFilter = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))",
-    sectionRectWidth = (radius) => radius * 0.08,
-    sectionRectHeight = (radius) => radius * 0.08,
-    sectionBorderStroke = (radius) => radius * 0.01,
-    sectionStrokeColor = "white",
-    sectionRecBorderSrtoke = (radius) => radius * 0.005,
-    unselecteSectionRecColor = "white",
-    selectedSectionRecBorderColor = "black",
-    unselectedSectionRecBorderColor = "black",
-    unSelectedSectionLabelShadow = "drop-shadow(0px 0px 0.7px rgba(0, 0, 0, 1))",
-
-    pointLabelFontSize = (radius) => radius * 0.06,
-    pointLabelFontWeight = "bold",
-    pointLabelTextColor = "whitesmoke",
-    pointLabelTextShadow = "0 0 1px black, 0 0 1px black",
-    pointRectWidth = (radius) => radius * 0.04,
-    pointRectHeight = (radius) => radius * 0.04,
-    pointBorderStroke = 1.4,
-    selectedPointRectborderShadow = (color) =>
-      `drop-shadow(0px 0px 3px ${color})`,
-    unSelectedPointRectborderShadow = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))",
-    selectedPointStrokeColor = "white",
-    pointRectRx = (radius) => radius * 0.08,
-    pointRectRy = (radius) => radius * 0.08,
-  } = config;
-
-  const baseCircles = generateBaseCircles(numCircles, colorCircles);
-  const {
-    handleSectionClick,
-    handleTargetsClick,
-    targetsData,
-    sectionsData,
-    width,
-    height,
-  } = useRadarComponent(data, onClick, radius);
   const svgRef = useRef(null);
-
+  const initialConfig = useRadarComponent({ data, onClick, config });
+  const radarConfigRef = useRef(initialConfig);
+  const {northColor,northFontSize,radius,north}=radarConfigRef.current;
   const styles = {
     body: {
       display: "flex",
@@ -71,6 +19,53 @@ function RadarComponent({ data, onClick, config }) {
   };
 
   useEffect(() => {
+    const {
+      handleSectionClick,
+      handleTargetsClick,
+      targetsData,
+      sectionsData,
+      width,
+      height,
+      radius,
+      numCircles,
+      colorCircles,
+      numLines,
+      opacityLines,
+      strokeLines,
+      colorLines,
+      circleStroke,
+      opacity,
+
+      sectionLabelFontSize,
+      sectionLabelFontWeight,
+      sectionLabelDefaultColor,
+      sectionLabelSelectedColor,
+      selectedSectiondropShadowFilter,
+      unSelectedSectiondropShadowFilter,
+      sectionRectWidth,
+      sectionRectHeight,
+      sectionBorderStroke,
+      sectionStrokeColor,
+      sectionRecBorderSrtoke,
+      unselecteSectionRecColor,
+      selectedSectionRecBorderColor,
+      unselectedSectionRecBorderColor,
+      unSelectedSectionLabelShadow,
+
+      pointLabelFontSize,
+      pointLabelFontWeight,
+      pointLabelTextColor,
+      pointLabelTextShadow,
+      pointRectWidth,
+      pointRectHeight,
+      pointBorderStroke,
+      selectedPointRectborderShadow,
+      unSelectedPointRectborderShadow,
+      selectedPointStrokeColor,
+      pointRectRx,
+      pointRectRy,
+    } = initialConfig;
+
     // Seleccionar el elemento SVG a través de la referencia y establecer sus atributos de ancho y alto
     const svg = d3
       .select(svgRef.current)
@@ -80,7 +75,7 @@ function RadarComponent({ data, onClick, config }) {
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     // Generar circulos
-    BaseCircles({ svg, radius, circleStroke, baseCircles });
+    BaseCircles({ svg, numCircles, colorCircles, radius, circleStroke });
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
     const lineAngles = d3
@@ -90,7 +85,7 @@ function RadarComponent({ data, onClick, config }) {
     // Dibujar líneas desde el centro hasta el radio especificado
     lineAngles.forEach((angle) => {
       const x2 = Math.cos(angle) * radius;
-      const y2 = Math.sin(angle) * (- radius + 1.5);
+      const y2 = Math.sin(angle) * (-radius + 1.5);
 
       svg
         .append("line")
@@ -150,19 +145,19 @@ function RadarComponent({ data, onClick, config }) {
         .append("rect")
         .attr("x", (d) => {
           const centroid = path.centroid(d);
-          return centroid[0] - (radius * 0.058);
+          return centroid[0] - radius * 0.058;
         })
         .attr("y", (d) => {
           const centroid = path.centroid(d);
-          return centroid[1] - (radius * 0.054);
+          return centroid[1] - radius * 0.054;
         })
         .attr("width", sectionRectWidth(radius))
         .attr("height", sectionRectHeight(radius))
         .attr("fill", (d) =>
           d.data.selected ? unselecteSectionRecColor : d.data.color
         )
-        .attr("rx",(radius*0.02) )
-        .attr("ry", (radius*0.02))
+        .attr("rx", radius * 0.02)
+        .attr("ry", radius * 0.02)
         .style("cursor", "pointer")
         .attr("stroke", (d) =>
           d.data.selected
@@ -255,7 +250,7 @@ function RadarComponent({ data, onClick, config }) {
           return `translate(${centroid})`;
         })
         .attr("dy", "0.34em")
-        .attr("dx", (radius*0.05))
+        .attr("dx", radius * 0.05)
         .text((d) => d.data.label)
         .style("font-size", pointLabelFontSize(radius))
         .style("text-shadow", pointLabelTextShadow)
@@ -269,14 +264,18 @@ function RadarComponent({ data, onClick, config }) {
     return () => {
       svg.selectAll("*").remove();
     };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetsData, sectionsData]);
+  }, [initialConfig]);
 
   return (
     <>
       <div style={styles.body} id="chart">
-        <span style={{ color: northColor, fontSize: northFontSize(radius), fontWeight:"bold" }}>
+        <span
+          style={{
+            color: northColor,
+            fontSize: northFontSize(radius),
+            fontWeight: "bold",
+          }}
+        >
           {north}
         </span>
         <svg width="800px" ref={svgRef}></svg>
