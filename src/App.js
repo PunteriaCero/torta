@@ -13,8 +13,15 @@ function App() {
     setSelectedRow(row);
   };
 
-  const onChange = (newValues, isAngle) => {
-    const [startAngle, endAngle, innerRadius, outerRadius] = newValues;
+  const onChange = (newValues) => {
+    let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
+    if (startAngle<0){
+      startAngle = startAngle + 360;
+    }
+    if (endAngle<0){
+      endAngle = endAngle + 360;
+    }
+
     const newSelectedRow = {...selectedRow, startAngle: startAngle, endAngle: endAngle, innerRadius: innerRadius, outerRadius: outerRadius} 
 
     const objetoExistenteIndex = currentData.sections.findIndex(

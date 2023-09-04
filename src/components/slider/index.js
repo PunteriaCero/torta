@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 
-
 function valuetext(value) {
-  return `${value}°C`;
+  return `${value}`;
 }
 
 export default function MinimumDistanceSlider({
@@ -28,15 +27,38 @@ export default function MinimumDistanceSlider({
     ]);
   }, [selectedRow]);
 
-  const handleChange1 = (event, newValue) => {
+  const handleChange1 = (event, newValue, activeThumb) => {
     const newValues = [newValue[0], newValue[1], value2[0] / 100, value2[1] / 100]
-    setValue1(newValue);
+
+    if (newValue[1] - newValue[0] < 5) {
+      if (activeThumb === 0) {
+        const clamped = Math.min(newValue[0], 360 - 5);
+        setValue1([clamped, clamped + 5]);
+      } else {
+        const clamped = Math.max(newValue[1], 5);
+        setValue1([clamped - 5, clamped]);
+      }
+    } else {
+      setValue1(newValue);
+    }
+
     onChange(newValues);
   };
 
-  const handleChange2 = (event, newValue) => {
-    const newValues = [value1[0] , value1[1], newValue[0] / 100, newValue[1] / 100]
-    setValue2(newValue);
+  const handleChange2 = (event, newValue, activeThumb) => {       
+    const newValues = [value1[0], value1[1], newValue[0] / 100, newValue[1] / 100]
+
+    if (newValue[1] - newValue[0] < 5) {
+      if (activeThumb === 0) {
+        const clamped = Math.min(newValue[0], 100 - 5);
+        setValue2([clamped, clamped + 5]);
+      } else {
+        const clamped = Math.max(newValue[1], 5);
+        setValue2([clamped - 5, clamped]);
+      }
+    } else {
+      setValue2(newValue);
+    }
     onChange(newValues);
   };
 
@@ -49,11 +71,12 @@ export default function MinimumDistanceSlider({
         getAriaLabel={() => "Minimum distance"}
         value={value1}
         onChange={handleChange1}
-        getAriaValueText={valuetext}
-        min={0}
+        min={-360}
         max={360}
         size="small"
         valueLabelDisplay="on"
+        valueLabelFormat={(value) => `${value < 0 ? value + 360 : value}°`}
+        disableSwap
       />
       <br />
       <br />
@@ -64,11 +87,12 @@ export default function MinimumDistanceSlider({
         getAriaLabel={() => "Minimum distance shift"}
         value={value2}
         onChange={handleChange2}
-        getAriaValueText={valuetext}
         min={0}
         max={100}
         size="small"
         valueLabelDisplay="on"
+        getAriaValueText={valuetext}
+        disableSwap
       />
     </Box>
   );
