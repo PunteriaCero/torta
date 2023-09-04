@@ -23,7 +23,7 @@ export const data = {
       startElevation: 4,
       endElevation: 80,
       color: "gray",
-      selected: true,
+      selected: false,
       value: 10,
     },
 

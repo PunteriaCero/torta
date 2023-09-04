@@ -40,12 +40,11 @@ export default function MinimumDistanceSlider({
     setValue1(newValue);
     const newSection = {
       ...updatedSection,
+      selected: false,
       startAngle: newValue[0],
       endAngle: newValue[1],
     };
     setUpdateSection(newSection);
-    // selectedRow.startAngle=newValue[0]
-    // selectedRow.endAngle=newValue[1]
     onChangeAngle(updatedSection);
   };
 
@@ -54,12 +53,11 @@ export default function MinimumDistanceSlider({
     setValue2(newValue);
     const newSection = {
       ...updatedSection,
+      selected: false,
       innerRadius: newValue[0] / 100,
       outerRadius: newValue[1] / 100,
     };
     setUpdateSection(newSection);
-    // selectedRow.innerRadius=newValue[0] / 100
-    // selectedRow.outerRadius=newValue[1] / 100
     onChangeAngle(updatedSection);
   };
 
