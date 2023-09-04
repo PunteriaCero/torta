@@ -13,14 +13,15 @@ function App() {
     setSelectedRow(row);
   };
 
-  const onChange = (newData) => {
+  const onChange = (modifiedSection) => {
+    console.log(modifiedSection);
     const objetoExistenteIndex = currentData.sections.findIndex(
-      (obj) => obj.label === newData.label
+      (obj) => obj.label === modifiedSection.label
     );
 
     if (objetoExistenteIndex !== -1) {
       const dataSectionsCopy = [...currentData.sections]; // Hacer una copia de currentData
-      dataSectionsCopy[objetoExistenteIndex] = newData; // Reemplazar el objeto en la copia
+      dataSectionsCopy[objetoExistenteIndex] = modifiedSection; // Reemplazar el objeto en la copia
       setCurrentData({ ...currentData, sections: dataSectionsCopy }); // Actualizar el estado con la copia modificada
     }
   };
