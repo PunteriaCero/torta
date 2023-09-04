@@ -13,16 +13,19 @@ function App() {
     setSelectedRow(row);
   };
 
-  const onChange = (modifiedSection) => {
-    console.log(modifiedSection);
+  const onChange = (newValues, isAngle) => {
+    const [startAngle, endAngle, innerRadius, outerRadius] = newValues;
+    const newSelectedRow = {...selectedRow, startAngle: startAngle, endAngle: endAngle, innerRadius: innerRadius, outerRadius: outerRadius} 
+
     const objetoExistenteIndex = currentData.sections.findIndex(
-      (obj) => obj.label === modifiedSection.label
+      (obj) => obj.label === newSelectedRow.label
     );
 
     if (objetoExistenteIndex !== -1) {
-      const dataSectionsCopy = [...currentData.sections]; // Hacer una copia de currentData
-      dataSectionsCopy[objetoExistenteIndex] = modifiedSection; // Reemplazar el objeto en la copia
-      setCurrentData({ ...currentData, sections: dataSectionsCopy }); // Actualizar el estado con la copia modificada
+      const dataSectionsCopy = [...currentData.sections];
+      dataSectionsCopy.map((section) => section.selected = false);
+      dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
+      setCurrentData({ ...currentData, sections: dataSectionsCopy });
     }
   };
 
@@ -48,8 +51,7 @@ function App() {
           <Slider
             key={JSON.stringify(selectedRow)}
             selectedRow={selectedRow}
-            onChangeAngle={onChange}
-            onChangeRadius={onChange}
+            onChange={onChange}
           />
         </div>
         <RadarComponent

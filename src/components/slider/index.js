@@ -8,15 +8,9 @@ function valuetext(value) {
 }
 
 export default function MinimumDistanceSlider({
-  selectedRow = { startAngle: 0, endAngle: 0, innerRadius: 0, outerRadius: 0 },
-  onChangeAngle,
-}) {
-  const defaultRow = {
-    startAngle: 0,
-    endAngle: 0,
-    innerRadius: 0,
-    outerRadius: 0,
-  };
+  selectedRow,
+  onChange,
+}) {  
   const [value1, setValue1] = useState([
     selectedRow.startAngle,
     selectedRow.endAngle,
@@ -25,7 +19,6 @@ export default function MinimumDistanceSlider({
     Math.trunc(selectedRow.innerRadius * 100),
     Math.trunc(selectedRow.outerRadius * 100),
   ]);
-  const [updatedSection, setUpdateSection] = useState(selectedRow);
 
   useEffect(() => {
     setValue1([selectedRow.startAngle, selectedRow.endAngle]);
@@ -36,29 +29,15 @@ export default function MinimumDistanceSlider({
   }, [selectedRow]);
 
   const handleChange1 = (event, newValue) => {
-    console.log("change1", updatedSection);
+    const newValues = [newValue[0], newValue[1], value2[0] / 100, value2[1] / 100]
     setValue1(newValue);
-    const newSection = {
-      ...updatedSection,
-      selected: false,
-      startAngle: newValue[0],
-      endAngle: newValue[1],
-    };
-    setUpdateSection(newSection);
-    onChangeAngle(updatedSection);
+    onChange(newValues);
   };
 
   const handleChange2 = (event, newValue) => {
-    console.log("change2", updatedSection);
+    const newValues = [value1[0] , value1[1], newValue[0] / 100, newValue[1] / 100]
     setValue2(newValue);
-    const newSection = {
-      ...updatedSection,
-      selected: false,
-      innerRadius: newValue[0] / 100,
-      outerRadius: newValue[1] / 100,
-    };
-    setUpdateSection(newSection);
-    onChangeAngle(updatedSection);
+    onChange(newValues);
   };
 
   return (
@@ -75,7 +54,6 @@ export default function MinimumDistanceSlider({
         max={360}
         size="small"
         valueLabelDisplay="on"
-        disabled={selectedRow === defaultRow}
       />
       <br />
       <br />
@@ -91,7 +69,6 @@ export default function MinimumDistanceSlider({
         max={100}
         size="small"
         valueLabelDisplay="on"
-        disabled={selectedRow === defaultRow}
       />
     </Box>
   );
