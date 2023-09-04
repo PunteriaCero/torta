@@ -38,8 +38,6 @@ export default function CustomizedTables({ data, selectedRow }) {
       >
         <TableHead>
           <TableRow>
-            {/* <TableCell padding="checkbox"></TableCell> */}
-            {/* <StyledTableCell>Dessert (100g serving)</StyledTableCell> */}
             <StyledTableCell align="center">Label</StyledTableCell>
             <StyledTableCell align="center">Start Angle</StyledTableCell>
             <StyledTableCell align="center">End Angle</StyledTableCell>
@@ -50,24 +48,12 @@ export default function CustomizedTables({ data, selectedRow }) {
         <TableBody>
           {data.map((row) => (
             <StyledTableRow
-              key={row.name}
+              key={row.label}
               style={{
                 backgroundColor:
                   selectedRow?.label === row.label ? "rgb(0, 189, 88)" : "rgb(82, 82, 82)",
               }}
             >
-              {/* <StyledTableCell component="th" scope="row">
-                {row.name}
-              </StyledTableCell> */}
-              {/* <Checkbox
-                color="primary"
-                // indeterminate={numSelected > 0 && numSelected < rowCount}
-                // checked={rowCount > 0 && numSelected === rowCount}
-                onChange={() => onClick(row)}
-                inputProps={{
-                  "aria-label": "select all desserts",
-                }}
-              /> */}
               <StyledTableCell style={{ color: "white" }} align="center">
                 {row.label}
               </StyledTableCell>
