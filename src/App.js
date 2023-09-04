@@ -8,20 +8,20 @@ function App() {
   const [selectedRow, setSelectedRow] = useState(
     data.sections.find((section) => section.selected)
   );
-  const [newSection, setNewSections] = useState(data);
+  const [currentData, setCurrentData] = useState(data);
   const onClick = (row) => {
     setSelectedRow(row);
   };
 
   const onChange = (newData) => {
-    const objetoExistenteIndex = newSection.sections.findIndex(
+    const objetoExistenteIndex = currentData.sections.findIndex(
       (obj) => obj.label === newData.label
     );
 
     if (objetoExistenteIndex !== -1) {
-      const newSectionsCopy = [...newSection.sections]; // Hacer una copia de newSection
-      newSectionsCopy[objetoExistenteIndex] = newData; // Reemplazar el objeto en la copia
-      setNewSections({ ...newSection, sections: newSectionsCopy }); // Actualizar el estado con la copia modificada
+      const dataSectionsCopy = [...currentData.sections]; // Hacer una copia de currentData
+      dataSectionsCopy[objetoExistenteIndex] = newData; // Reemplazar el objeto en la copia
+      setCurrentData({ ...currentData, sections: dataSectionsCopy }); // Actualizar el estado con la copia modificada
     }
   };
 
@@ -40,7 +40,7 @@ function App() {
             onClick={() => null}
           ></Button>
           <DataTable
-            data={newSection.sections}
+            data={currentData.sections}
             onClick={onClick}
             selectedRow={selectedRow}
           />
@@ -52,8 +52,8 @@ function App() {
           />
         </div>
         <RadarComponent
-          key={JSON.stringify(newSection)}
-          data={newSection}
+          key={JSON.stringify(currentData)}
+          data={currentData}
           onClick={onClick}
           config={{
             radius: "280",
