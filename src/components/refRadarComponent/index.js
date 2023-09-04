@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
+
 import { BaseCircles, BaseLines } from "./utils";
 import useRadarComponent from "./hooks/useRadarComponent";
 
@@ -33,7 +34,7 @@ function RadarComponent({ data, onClick, config }) {
       opacityLines,
       strokeLines,
       colorLines,
-      circleStroke,
+      strokeCircles,
       opacity,
 
       sectionLabelFontSize,
@@ -75,7 +76,8 @@ function RadarComponent({ data, onClick, config }) {
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     // Generar circulos
-    BaseCircles({ svg, numCircles, colorCircles, radius, circleStroke });
+    BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
+
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
     const lineAngles = d3
@@ -97,6 +99,7 @@ function RadarComponent({ data, onClick, config }) {
       .value((d) => d.value)
       .sort(null);
 
+    // Si existen sections se renderizan en el radar
     if (sectionsData) {
       // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
       const sections = svg
@@ -184,6 +187,8 @@ function RadarComponent({ data, onClick, config }) {
       // Establecer manejadores de eventos de clic para las secciones y los puntos
       sections.on("click", handleSectionClick);
     }
+    
+    // Si existen targets se renderizan en el radar
     if (targetsData) {
       // Definir un generador de arco para los puntos
       const pathPoint = d3
