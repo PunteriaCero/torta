@@ -59,7 +59,6 @@ export default function MinimumDistanceSlider({
     } else {
       setValue2(newValue);
     }
-
     onChange(newValues);
   };
 
