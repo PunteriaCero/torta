@@ -26,7 +26,7 @@ export function BaseCircles({
       .attr("cy", 0)
       .attr("r", circle.radius * (radius - 3))
       .attr("stroke", circle.color)
-      .attr("stroke-width", circleStroke)
+      .attr("stroke-width", strokeCircles)
       .attr("fill", "none");
   });
 }
