@@ -13,16 +13,24 @@ function App() {
     setSelectedRow(row);
   };
 
+  const [disabled, setDisabled] = useState(false);
+
   const onChange = (newValues) => {
     let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
-    if (startAngle<0){
+    if (startAngle < 0) {
       startAngle = startAngle + 360;
     }
-    if (endAngle<0){
+    if (endAngle < 0) {
       endAngle = endAngle + 360;
     }
 
-    const newSelectedRow = {...selectedRow, startAngle: startAngle, endAngle: endAngle, innerRadius: innerRadius, outerRadius: outerRadius} 
+    const newSelectedRow = {
+      ...selectedRow,
+      startAngle: startAngle,
+      endAngle: endAngle,
+      innerRadius: innerRadius,
+      outerRadius: outerRadius,
+    };
 
     const objetoExistenteIndex = currentData.sections.findIndex(
       (obj) => obj.label === newSelectedRow.label
@@ -30,7 +38,7 @@ function App() {
 
     if (objetoExistenteIndex !== -1) {
       const dataSectionsCopy = [...currentData.sections];
-      dataSectionsCopy.map((section) => section.selected = false);
+      dataSectionsCopy.map((section) => (section.selected = false));
       dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
       setCurrentData({ ...currentData, sections: dataSectionsCopy });
     }
@@ -48,9 +56,10 @@ function App() {
               position: "relative",
               top: "18px",
             }}
-            onClick={() =>
-              setCurrentData(currentData === data ? dataDos : data)
-            }
+            onClick={() => {
+              setDisabled(!disabled);
+              setCurrentData(currentData === data ? dataDos : data);
+            }}
           >
             Change Mode
           </Button>
@@ -59,11 +68,13 @@ function App() {
             onClick={onClick}
             selectedRow={selectedRow}
           />
-          <Slider
-            key={JSON.stringify(selectedRow)}
-            selectedRow={selectedRow}
-            onChange={onChange}
-          />
+          <div style={{ visibility:disabled?"hidden":"visible" }}>
+            <Slider
+              key={JSON.stringify(selectedRow)}
+              selectedRow={selectedRow}
+              onChange={onChange}
+            />
+          </div>
         </div>
         <RadarComponent
           key={JSON.stringify(currentData)}
