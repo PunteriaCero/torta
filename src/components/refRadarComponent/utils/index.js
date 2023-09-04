@@ -14,7 +14,7 @@ export function BaseCircles({
   numCircles,
   colorCircles,
   radius,
-  circleStroke,
+  strokeCircles,
 }) {
   const baseCircles = generateBaseCircles(numCircles, colorCircles);
   const base = svg.append("g").attr("class", "base");

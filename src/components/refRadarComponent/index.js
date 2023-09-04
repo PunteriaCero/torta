@@ -34,7 +34,7 @@ function RadarComponent({ data, onClick, config }) {
       opacityLines,
       strokeLines,
       colorLines,
-      circleStroke,
+      strokeCircles,
       opacity,
 
       sectionLabelFontSize,
@@ -77,7 +77,7 @@ function RadarComponent({ data, onClick, config }) {
 
     // Generar circulos
 
-    BaseCircles({ svg, numCircles, colorCircles, radius, circleStroke });
+    BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
     const lineAngles = d3
