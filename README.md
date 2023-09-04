@@ -2,6 +2,8 @@
 
 This project consists of an interactive data visualization using D3.js and React. The visualization shows circular elements with sections and points, where users can interact by selecting different sections and points.
 
+example online: https://punteriacero.github.io/torta/
+
 ## Characteristics
 
 - The visualization shows circular elements with sections and points.
