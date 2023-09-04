@@ -1,13 +1,13 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-import { BaseCircles } from "./utils";
+import { BaseCircles, BaseLines } from "./utils";
 import useRadarComponent from "./hooks/useRadarComponent";
 
 function RadarComponent({ data, onClick, config }) {
   const svgRef = useRef(null);
   const initialConfig = useRadarComponent({ data, onClick, config });
   const radarConfigRef = useRef(initialConfig);
-  const {northColor,northFontSize,radius,north}=radarConfigRef.current;
+  const { northColor, northFontSize, radius, north } = radarConfigRef.current;
   const styles = {
     body: {
       display: "flex",
@@ -82,21 +82,15 @@ function RadarComponent({ data, onClick, config }) {
       .range(numLines)
       .map((i) => ((i * 360) / numLines) * (Math.PI / 180));
 
-    // Dibujar líneas desde el centro hasta el radio especificado
-    lineAngles.forEach((angle) => {
-      const x2 = Math.cos(angle) * radius;
-      const y2 = Math.sin(angle) * (-radius + 1.5);
-
-      svg
-        .append("line")
-        .attr("x1", 0)
-        .attr("y1", 0)
-        .attr("x2", x2)
-        .attr("y2", y2)
-        .attr("stroke", colorLines)
-        .attr("stroke-width", strokeLines)
-        .attr("opacity", opacityLines);
+    BaseLines({
+      lineAngles,
+      radius,
+      colorLines,
+      strokeLines,
+      opacityLines,
+      svg,
     });
+    
     // Crear un generador de pie
     const pie = d3
       .pie()
