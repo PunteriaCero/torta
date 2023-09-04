@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-import { generateBaseCircles, BaseCircles } from "./utils";
+import { generateBaseCircles, renderBaseCircles, renderBaseLines } from "./utils";
 import useRadarComponent from "./hooks/useRadarComponent";
 
 function RadarComponent({ data, onClick, config }) {
@@ -12,7 +12,7 @@ function RadarComponent({ data, onClick, config }) {
     opacityLines = 0.3,
     strokeLines = 1,
     colorLines = "green",
-    circleStroke = 3,
+    strokeCircles = 3,
     north = "N",
     northColor = "rgb(9, 115, 9)",
     northFontSize = (radius) => (radius*0.06),
@@ -80,34 +80,18 @@ function RadarComponent({ data, onClick, config }) {
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     // Generar circulos
-    BaseCircles({ svg, radius, circleStroke, baseCircles });
-
-    // Definir ángulos para las líneas desde el centro hasta el radio máximo
-    const lineAngles = d3
-      .range(numLines)
-      .map((i) => ((i * 360) / numLines) * (Math.PI / 180));
-
-    // Dibujar líneas desde el centro hasta el radio especificado
-    lineAngles.forEach((angle) => {
-      const x2 = Math.cos(angle) * radius;
-      const y2 = Math.sin(angle) * (- radius + 1.5);
-
-      svg
-        .append("line")
-        .attr("x1", 0)
-        .attr("y1", 0)
-        .attr("x2", x2)
-        .attr("y2", y2)
-        .attr("stroke", colorLines)
-        .attr("stroke-width", strokeLines)
-        .attr("opacity", opacityLines);
-    });
+    renderBaseCircles({ svg, radius, strokeCircles, baseCircles });
+    
+    // Generar lineas radiales
+    renderBaseLines({svg, numLines, radius, colorLines, strokeLines, opacityLines});
+    
     // Crear un generador de pie
     const pie = d3
       .pie()
       .value((d) => d.value)
       .sort(null);
 
+    // Si existen sections se renderizan en el radar
     if (sectionsData) {
       // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
       const sections = svg
@@ -195,6 +179,8 @@ function RadarComponent({ data, onClick, config }) {
       // Establecer manejadores de eventos de clic para las secciones y los puntos
       sections.on("click", handleSectionClick);
     }
+    
+    // Si existen targets se renderizan en el radar
     if (targetsData) {
       // Definir un generador de arco para los puntos
       const pathPoint = d3

@@ -25,10 +25,6 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    // console.log(newSection)
-  }, [newSection]);
-
   return (
     <div className="App">
       <div className="container">
@@ -41,10 +37,8 @@ function App() {
               position: "relative",
               top: "18px",
             }}
-            onClick={()=>null}
-          >
-            New
-          </Button>
+            onClick={() => null}
+          ></Button>
           <DataTable
             data={newSection.sections}
             onClick={onClick}
@@ -61,7 +55,12 @@ function App() {
           key={JSON.stringify(newSection)}
           data={newSection}
           onClick={onClick}
-          config={{ radius: "280", colorCircles: "rgb(0, 189, 88)", strokeLines:2 }}
+          config={{
+            radius: "280",
+            colorCircles: "rgb(0, 189, 88)",
+            strokeLines: 2,
+            strokeCircles: 2,
+          }}
         />
       </div>
     </div>
