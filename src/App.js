@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 
 function App() {
   const [selectedRow, setSelectedRow] = useState(
-    data.sections.find((section) => section.selected)
+    data.sections.find((section) => section.selected) ?? data.sections[0]
   );
   const [currentData, setCurrentData] = useState(data);
   const onClick = (row) => {

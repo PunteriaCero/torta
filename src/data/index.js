@@ -33,7 +33,7 @@ export const data = {
       outerRadius: 0.7,
       startElevation: 4,
       color: "orange",
-      selected: false,
+      selected: true,
       value: 10,
     },    
   ],
