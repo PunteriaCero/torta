@@ -76,8 +76,8 @@ function RadarComponent({ data, onClick, config }) {
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     // Generar circulos
-
     BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
+
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
     const lineAngles = d3
