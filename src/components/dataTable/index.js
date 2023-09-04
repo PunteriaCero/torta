@@ -33,44 +33,84 @@ export default function CustomizedTables({ data, selectedRow }) {
     <TableContainer component={Paper}>
       <Table
         sx={{ minWidth: 700 }}
-        style={{ backgroundColor: "rgb(37, 36, 36)",borderRadius:"10px" }}
+        style={{ backgroundColor: "rgb(37, 36, 36)", borderRadius: "10px" }}
         aria-label="customized table"
       >
         <TableHead>
-          <TableRow>
-            <StyledTableCell align="center">Label</StyledTableCell>
-            <StyledTableCell align="center">Start Angle</StyledTableCell>
-            <StyledTableCell align="center">End Angle</StyledTableCell>
-            <StyledTableCell align="center">Inner Radius</StyledTableCell>
-            <StyledTableCell align="center">Outer Radius</StyledTableCell>
-          </TableRow>
+          {
+            //Sections
+            data?.sections?.length ? (
+              <TableRow>
+                <StyledTableCell align="center">Label</StyledTableCell>
+                <StyledTableCell align="center">Start Angle</StyledTableCell>
+                <StyledTableCell align="center">End Angle</StyledTableCell>
+                <StyledTableCell align="center">Inner Radius</StyledTableCell>
+                <StyledTableCell align="center">Outer Radius</StyledTableCell>
+              </TableRow>
+            ) : (
+              //Targets
+              <TableRow>
+                <StyledTableCell align="center">Label</StyledTableCell>
+                <StyledTableCell align="center">Angle</StyledTableCell>
+                <StyledTableCell align="center">Radius</StyledTableCell>
+              </TableRow>
+            )
+          }
         </TableHead>
         <TableBody>
-          {data.map((row) => (
-            <StyledTableRow
-              key={row.label}
-              style={{
-                backgroundColor:
-                  selectedRow?.label === row.label ? "rgb(0, 189, 88)" : "rgb(82, 82, 82)",
-              }}
-            >
-              <StyledTableCell style={{ color: "white" }} align="center">
-                {row.label}
-              </StyledTableCell>
-              <StyledTableCell style={{ color: "white" }} align="center">
-                {row.startAngle}
-              </StyledTableCell>
-              <StyledTableCell style={{ color: "white" }} align="center">
-                {row.endAngle}
-              </StyledTableCell>
-              <StyledTableCell style={{ color: "white" }} align="center">
-                {Math.trunc(row.innerRadius * 100)}
-              </StyledTableCell>
-              <StyledTableCell align="center" style={{ color: "white" }}>
-                {Math.trunc(row.outerRadius * 100)}
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
+          {
+            //Sections
+            data?.sections?.length
+              ? data.sections.map((row) => (
+                  <StyledTableRow
+                    key={row.label}
+                    style={{
+                      backgroundColor:
+                        selectedRow?.label === row.label
+                          ? "rgb(0, 189, 88)"
+                          : "rgb(82, 82, 82)",
+                    }}
+                  >
+                    <StyledTableCell style={{ color: "white" }} align="center">
+                      {row.label}
+                    </StyledTableCell>
+                    <StyledTableCell style={{ color: "white" }} align="center">
+                      {row.startAngle}
+                    </StyledTableCell>
+                    <StyledTableCell style={{ color: "white" }} align="center">
+                      {row.endAngle}
+                    </StyledTableCell>
+                    <StyledTableCell style={{ color: "white" }} align="center">
+                      {Math.trunc(row.innerRadius * 100)}
+                    </StyledTableCell>
+                    <StyledTableCell align="center" style={{ color: "white" }}>
+                      {Math.trunc(row.outerRadius * 100)}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))
+              : //Targets
+                data.targets.map((row) => (
+                  <StyledTableRow
+                    key={row.label}
+                    style={{
+                      backgroundColor:
+                        selectedRow?.label === row.label
+                          ? "rgb(0, 189, 88)"
+                          : "rgb(82, 82, 82)",
+                    }}
+                  >
+                    <StyledTableCell style={{ color: "white" }} align="center">
+                      {row.label}
+                    </StyledTableCell>
+                    <StyledTableCell style={{ color: "white" }} align="center">
+                      {row.angle}
+                    </StyledTableCell>
+                    <StyledTableCell style={{ color: "white" }} align="center">
+                      {row.radius * 100}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))
+          }
         </TableBody>
       </Table>
     </TableContainer>

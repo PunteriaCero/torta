@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import { DataTable, RadarComponent, Slider } from "./components";
-import { data } from "./data";
+import { data, dataDos } from "./data";
 import Button from "@mui/material/Button";
 
 function App() {
@@ -41,10 +41,14 @@ function App() {
               position: "relative",
               top: "18px",
             }}
-            onClick={() => null}
-          ></Button>
+            onClick={() =>
+              setCurrentData(currentData === data ? dataDos : data)
+            }
+          >
+            Change Mode
+          </Button>
           <DataTable
-            data={currentData.sections}
+            data={currentData}
             onClick={onClick}
             selectedRow={selectedRow}
           />
