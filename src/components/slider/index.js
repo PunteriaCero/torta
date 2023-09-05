@@ -28,20 +28,21 @@ export default function MinimumDistanceSlider({
   }, [selectedRow]);
 
   const handleChange1 = (event, newValue, activeThumb) => {
-    const newValues = [newValue[0], newValue[1], value2[0] / 100, value2[1] / 100]
-
+    const newValues = [newValue[0], newValue[1], value2[0] / 100, value2[1] / 100];
+  
+    // Mantener una distancia de 5 unidades en el rango -360 a 360
     if (newValue[1] - newValue[0] < 5) {
       if (activeThumb === 0) {
-        const clamped = Math.min(newValue[0], 360 - 5);
+        const clamped = Math.max(newValue[0], -360 + 5);
         setValue1([clamped, clamped + 5]);
       } else {
-        const clamped = Math.max(newValue[1], 5);
+        const clamped = Math.min(newValue[1], 360 - 5);
         setValue1([clamped - 5, clamped]);
       }
     } else {
       setValue1(newValue);
     }
-
+  
     onChange(newValues);
   };
 
