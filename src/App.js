@@ -58,8 +58,8 @@ function App() {
               top: "18px",
             }}
             onClick={() => {
+              setCurrentData(currentData.sections.length ? dataDos : data);
               setDisabled(!disabled);
-              setCurrentData(currentData === data ? dataDos : data);
             }}
           >
             Change Mode
@@ -69,7 +69,7 @@ function App() {
             onClick={onClick}
             selectedRow={selectedRow}
           />
-          <div style={{ visibility:disabled?"hidden":"visible" }}>
+          <div style={{ visibility: disabled ? "hidden" : "visible" }}>
             <Slider
               key={JSON.stringify(selectedRow)}
               selectedRow={selectedRow}
