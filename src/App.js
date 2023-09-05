@@ -17,11 +17,12 @@ function App() {
 
   const onChange = (newValues) => {
     let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
+
     if (startAngle < 0) {
-      startAngle = startAngle + 360;
+      startAngle += 360;
     }
     if (endAngle < 0) {
-      endAngle = endAngle + 360;
+      endAngle += 360;
     }
 
     const newSelectedRow = {
