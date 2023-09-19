@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { compareByEndElevation } from "../../utils";
 
 export const useRadarComponent = ({
@@ -46,9 +46,11 @@ export const useRadarComponent = ({
     pointRectRx = (radius) => radius * 0.08,
     pointRectRy = (radius) => radius * 0.08,
   },
+  svgRef,
 }) => {
   const [sectionsData, setSectionsData] = useState(data.sections);
   const [targetsData, settTargetsData] = useState(data.targets);
+  const [selectedAngle, setSelectedAngle] = useState(false);
   const width = radius * 2;
   const height = width;
 
@@ -63,6 +65,25 @@ export const useRadarComponent = ({
     dataArray.map((data) => ({ ...data, selected: data.label === label }));
 
   const handleSectionClick = (event, d) => {
+    // d.data.startAngle = d.data.startAngle - 1;
+    // console.log(
+    //   d.data.startAngle > d.data.endAngle
+    //     ? (d.data.startAngle - 360) * (Math.PI / 180)
+    //     : d.data.startAngle * (Math.PI / 180),
+    //   d.data.endAngle * (Math.PI / 180)
+    // );
+
+    // const svg = d3.select(svgRef.current);
+    // console.log("width", width);
+    // console.log("height", height);
+    // console.log("position x", event.x,d);
+    const centerX = width / 2; // Ancho del gráfico dividido por 2
+    const centerY = height / 2; // Alto del gráfico dividido por 2
+    const x = event.x - centerX; // Distancia horizontal desde el centro
+    const y = centerY - event.y; // Distancia vertical desde el centro (nota el signo negativo)
+
+    // Calcular el ángulo en radianes
+
     const newSectionsData = updateSelectedState(sectionsData, d.data.label);
     if (targetsData) {
       const newTargetsData = updateSelectedState(targetsData, null); // Unselect all targets
@@ -84,9 +105,67 @@ export const useRadarComponent = ({
     onClick(newSelectedTarget);
   };
 
+  const handleSectionDragStart = (event, d) => {
+    const rad = Math.atan2(event.y, event.x);
+    const deg = rad * (180 / Math.PI) + 90;
+    console.log(rad);
+    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    if (d.data.endElevation - deg > deg - d.data.startAngle) {
+      setSelectedAngle(true);
+    } else {
+      console.log("entro 2");
+      // setSelectedAngle(false);
+    }
+  };
+
+  const handleSectionDragEnd = (event, d) => {
+    // console.log("drag", event, d);
+    // Calcular el ángulo en radianes
+    const x = event.x - width / 2;
+    const y = height / 2 - event.y;
+
+    // Calcula el ángulo actual basado en las coordenadas del mouse
+    // const currentAngle = (Math.atan2(y, x) * 180) / Math.PI;
+    // const angleDifference = currentAngle - d.startAngle;
+    const rad = Math.atan2(event.y, event.x);
+    const deg = rad * (180 / Math.PI) + 90;
+    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    const hpMax = svgRef.current.getBoundingClientRect().width / 2;
+    const radie = hp / hpMax;
+    const obj = {
+      rad: rad,
+      deg: deg,
+      x: event.x,
+      y: event.y,
+      radie: radie,
+    };
+    console.log(obj.x, obj.y);
+    // console.log("obj input", obj);
+    // Calcula el ángulo de inicio ajustado
+    console.log("d", d);
+    const addIndex = sectionsData.map((section, index) => {
+      return { ...section, index: index };
+    });
+    const newSections = addIndex.map((section, index) => {
+      //agregar index a data
+      console.log("section");
+      return {
+        ...section,
+        startAngle:
+          index === d.index && !selectedAngle ? obj.deg : section.startAngle,
+        endAngle:
+          index === d.index && selectedAngle ? obj.deg : section.endAngle,
+      };
+    });
+    setSectionsData(newSections);
+    // El ángulo en radianes ahora está almacenado en 'angleInRadians'
+  };
+
   return {
     handleSectionClick,
     handleTargetsClick,
+    handleSectionDragEnd,
+    handleSectionDragStart,
     targetsData,
     sectionsData,
     width,
@@ -103,7 +182,6 @@ export const useRadarComponent = ({
     northColor,
     northFontSize,
     opacity,
-
     sectionLabelFontSize,
     sectionLabelFontWeight,
     sectionLabelDefaultColor,

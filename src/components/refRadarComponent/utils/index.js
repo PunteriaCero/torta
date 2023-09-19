@@ -31,12 +31,19 @@ export function BaseCircles({
   });
 }
 
-export function BaseLines({ lineAngles,radius,colorLines,strokeLines,opacityLines, svg }) {
+export function BaseLines({
+  lineAngles,
+  radius,
+  colorLines,
+  strokeLines,
+  opacityLines,
+  svg,
+}) {
   // Dibujar líneas desde el centro hasta el radio especificado
   lineAngles.forEach((angle) => {
     const x2 = Math.cos(angle) * radius;
     const y2 = Math.sin(angle) * (-radius + 1.5);
-
+    // console.log("x,y", angle, x2, y2);
     svg
       .append("line")
       .attr("x1", 0)

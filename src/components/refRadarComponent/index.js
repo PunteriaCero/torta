@@ -6,7 +6,7 @@ import useRadarComponent from "./hooks/useRadarComponent";
 
 function RadarComponent({ data, onClick, config }) {
   const svgRef = useRef(null);
-  const initialConfig = useRadarComponent({ data, onClick, config });
+  const initialConfig = useRadarComponent({ data, onClick, config, svgRef });
   const radarConfigRef = useRef(initialConfig);
   const { northColor, northFontSize, radius, north } = radarConfigRef.current;
   const styles = {
@@ -23,6 +23,9 @@ function RadarComponent({ data, onClick, config }) {
     const {
       handleSectionClick,
       handleTargetsClick,
+      handleSectionDragEnd,
+      handleSectionDragStart,
+
       targetsData,
       sectionsData,
       width,
@@ -52,7 +55,6 @@ function RadarComponent({ data, onClick, config }) {
       selectedSectionRecBorderColor,
       unselectedSectionRecBorderColor,
       unSelectedSectionLabelShadow,
-
       pointLabelFontSize,
       pointLabelFontWeight,
       pointLabelTextColor,
@@ -75,15 +77,24 @@ function RadarComponent({ data, onClick, config }) {
       .append("g")
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
+    svg.on("click", (event) => {
+      console.log("event", event);
+    });
+
+    // const element = svg.current;
+
     // Generar circulos
 
     BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
-    const lineAngles = d3
-      .range(numLines)
-      .map((i) => ((i * 360) / numLines) * (Math.PI / 180));
 
+    const lineAngles = d3.range(numLines).map((i) => {
+      // console.log("i", i);
+      return ((i * 360) / numLines) * (Math.PI / 180);
+    });
+
+    // console.log("line angles", lineAngles);
     BaseLines({
       lineAngles,
       radius,
@@ -92,7 +103,7 @@ function RadarComponent({ data, onClick, config }) {
       opacityLines,
       svg,
     });
-    
+
     // Crear un generador de pie
     const pie = d3
       .pie()
@@ -120,6 +131,11 @@ function RadarComponent({ data, onClick, config }) {
         )
         .endAngle((d) => d.data.endAngle * (Math.PI / 180));
 
+      const svgElement = svgRef.current;
+
+      // Obtén las coordenadas del extremo superior izquierdo del SVG
+      const svgBounds = svgElement.getBoundingClientRect();
+      console.log(svgBounds);
       // Agregar elementos de tipo "path" para las secciones
       sections
         .append("path")
@@ -186,8 +202,19 @@ function RadarComponent({ data, onClick, config }) {
 
       // Establecer manejadores de eventos de clic para las secciones y los puntos
       sections.on("click", handleSectionClick);
+
+      sections.call(
+        d3
+          .drag()
+          .on("start", handleSectionDragStart)
+          .on("drag", (event) => {
+            // console.log("transcurso", e);
+            // event.subject.startAngle = 10;
+          })
+          .on("end", handleSectionDragEnd)
+      );
     }
-    
+
     // Si existen targets se renderizan en el radar
     if (targetsData) {
       // Definir un generador de arco para los puntos
