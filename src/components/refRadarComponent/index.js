@@ -25,7 +25,7 @@ function RadarComponent({ data, onClick, config }) {
       handleTargetsClick,
       handleSectionDragEnd,
       handleSectionDragStart,
-
+      handleSectionDrag,
       targetsData,
       sectionsData,
       width,
@@ -135,7 +135,6 @@ function RadarComponent({ data, onClick, config }) {
 
       // Obtén las coordenadas del extremo superior izquierdo del SVG
       const svgBounds = svgElement.getBoundingClientRect();
-      console.log(svgBounds);
       // Agregar elementos de tipo "path" para las secciones
       sections
         .append("path")
@@ -207,10 +206,7 @@ function RadarComponent({ data, onClick, config }) {
         d3
           .drag()
           .on("start", handleSectionDragStart)
-          .on("drag", (event) => {
-            // console.log("transcurso", e);
-            // event.subject.startAngle = 10;
-          })
+          .on("drag", handleSectionDrag)
           .on("end", handleSectionDragEnd)
       );
     }

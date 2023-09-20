@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { compareByEndElevation } from "../../utils";
 
 export const useRadarComponent = ({
@@ -50,9 +50,12 @@ export const useRadarComponent = ({
 }) => {
   const [sectionsData, setSectionsData] = useState(data.sections);
   const [targetsData, settTargetsData] = useState(data.targets);
-  const [selectedAngle, setSelectedAngle] = useState(false);
+  const [selectedAngle, setSelectedAngle] = useState(true);
+  const [positionClick, setPositionClick] = useState(0);
   const width = radius * 2;
   const height = width;
+  const selectedAngleRef = useRef(selectedAngle);
+  const positionClickRef = useRef(positionClick);
 
   if (sectionsData) {
     sectionsData.sort(compareByEndElevation);
@@ -105,25 +108,39 @@ export const useRadarComponent = ({
     onClick(newSelectedTarget);
   };
 
+  useEffect(() => {
+    selectedAngleRef.current = selectedAngle;
+  }, [selectedAngle]);
+
   const handleSectionDragStart = (event, d) => {
     const rad = Math.atan2(event.y, event.x);
     const deg = rad * (180 / Math.PI) + 90;
-    console.log(rad);
+    setPositionClick(deg);
+    const currentSelectedAngle = selectedAngleRef.current;
+
+    const currentPositionClick = positionClickRef.current;
+    console.log(
+      rad,
+      d.data.endElevation * (Math.PI / 180),
+      d.data.startAngle * (Math.PI / 180)
+    );
     const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
-    if (d.data.endElevation - deg > deg - d.data.startAngle) {
+
+    if (d.data.endAngle - deg < deg - d.data.startAngle) {
+      setSelectedAngle(false);
+    }
+    if (d.data.endAngle - deg > deg - d.data.startAngle) {
       setSelectedAngle(true);
-    } else {
-      console.log("entro 2");
-      // setSelectedAngle(false);
     }
   };
 
+  const handleSectionDrag = (event, d) => {};
   const handleSectionDragEnd = (event, d) => {
     // console.log("drag", event, d);
     // Calcular el ángulo en radianes
     const x = event.x - width / 2;
     const y = height / 2 - event.y;
-
+    console.log(selectedAngleRef.current);
     // Calcula el ángulo actual basado en las coordenadas del mouse
     // const currentAngle = (Math.atan2(y, x) * 180) / Math.PI;
     // const angleDifference = currentAngle - d.startAngle;
@@ -139,22 +156,16 @@ export const useRadarComponent = ({
       y: event.y,
       radie: radie,
     };
-    console.log(obj.x, obj.y);
     // console.log("obj input", obj);
     // Calcula el ángulo de inicio ajustado
-    console.log("d", d);
-    const addIndex = sectionsData.map((section, index) => {
-      return { ...section, index: index };
-    });
-    const newSections = addIndex.map((section, index) => {
+    const newSections = sectionsData.map((section, index) => {
       //agregar index a data
-      console.log("section");
       return {
         ...section,
         startAngle:
-          index === d.index && !selectedAngle ? obj.deg : section.startAngle,
+          index === d.index && selectedAngle ? obj.deg : section.startAngle,
         endAngle:
-          index === d.index && selectedAngle ? obj.deg : section.endAngle,
+          index === d.index && !selectedAngle ? obj.deg : section.endAngle,
       };
     });
     setSectionsData(newSections);
@@ -166,6 +177,7 @@ export const useRadarComponent = ({
     handleTargetsClick,
     handleSectionDragEnd,
     handleSectionDragStart,
+    handleSectionDrag,
     targetsData,
     sectionsData,
     width,
