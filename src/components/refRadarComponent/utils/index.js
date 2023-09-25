@@ -17,17 +17,17 @@ export function BaseCircles({
   strokeCircles,
 }) {
   const baseCircles = generateBaseCircles(numCircles, colorCircles);
-  const base = svg.append("g").attr("class", "base");
+  const base = svg.append('g').attr('class', 'base');
 
   baseCircles.forEach((circle) => {
     base
-      .append("circle")
-      .attr("cx", 0)
-      .attr("cy", 0)
-      .attr("r", circle.radius * (radius - 3))
-      .attr("stroke", circle.color)
-      .attr("stroke-width", strokeCircles)
-      .attr("fill", "none");
+      .append('circle')
+      .attr('cx', 0)
+      .attr('cy', 0)
+      .attr('r', circle.radius * (radius - 3))
+      .attr('stroke', circle.color)
+      .attr('stroke-width', strokeCircles)
+      .attr('fill', 'none');
   });
 }
 
@@ -45,14 +45,14 @@ export function BaseLines({
     const y2 = Math.sin(angle) * (-radius + 1.5);
     // console.log("x,y", angle, x2, y2);
     svg
-      .append("line")
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", x2)
-      .attr("y2", y2)
-      .attr("stroke", colorLines)
-      .attr("stroke-width", strokeLines)
-      .attr("opacity", opacityLines);
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', 0)
+      .attr('x2', x2)
+      .attr('y2', y2)
+      .attr('stroke', colorLines)
+      .attr('stroke-width', strokeLines)
+      .attr('opacity', opacityLines);
   });
 }
 

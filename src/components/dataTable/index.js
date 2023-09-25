@@ -1,12 +1,13 @@
-import React from "react";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import React from 'react';
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { useDataSelector, useItemSelector } from '../../redux/hooks/dataHooks';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -19,27 +20,29 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
+  '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
   // hide last border
-  "&:last-child td, &:last-child th": {
+  '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
 
-export default function CustomizedTables({ data, selectedRow }) {
+export default function CustomizedTables() {
+  const dataHook = useDataSelector();
+  const selectedRow = useItemSelector();
   return (
     <TableContainer component={Paper}>
       <Table
         sx={{ minWidth: 700 }}
-        style={{ backgroundColor: "rgb(37, 36, 36)", borderRadius: "10px" }}
+        style={{ backgroundColor: 'rgb(37, 36, 36)', borderRadius: '10px' }}
         aria-label="customized table"
       >
         <TableHead>
           {
             //Sections
-            data?.sections?.length ? (
+            dataHook?.sections?.length ? (
               <TableRow>
                 <StyledTableCell align="center">Label</StyledTableCell>
                 <StyledTableCell align="center">Start Angle</StyledTableCell>
@@ -60,52 +63,52 @@ export default function CustomizedTables({ data, selectedRow }) {
         <TableBody>
           {
             //Sections
-            data?.sections?.length
-              ? data.sections.map((row) => (
+            dataHook?.sections?.length
+              ? dataHook.sections.map((row) => (
                   <StyledTableRow
                     key={row.label}
                     style={{
                       backgroundColor:
                         selectedRow?.label === row.label
-                          ? "rgb(0, 189, 88)"
-                          : "rgb(82, 82, 82)",
+                          ? 'rgb(0, 189, 88)'
+                          : 'rgb(82, 82, 82)',
                     }}
                   >
-                    <StyledTableCell style={{ color: "white" }} align="center">
+                    <StyledTableCell style={{ color: 'white' }} align="center">
                       {row.label}
                     </StyledTableCell>
-                    <StyledTableCell style={{ color: "white" }} align="center">
+                    <StyledTableCell style={{ color: 'white' }} align="center">
                       {row.startAngle}
                     </StyledTableCell>
-                    <StyledTableCell style={{ color: "white" }} align="center">
+                    <StyledTableCell style={{ color: 'white' }} align="center">
                       {row.endAngle}
                     </StyledTableCell>
-                    <StyledTableCell style={{ color: "white" }} align="center">
+                    <StyledTableCell style={{ color: 'white' }} align="center">
                       {Math.trunc(row.innerRadius * 100)}
                     </StyledTableCell>
-                    <StyledTableCell align="center" style={{ color: "white" }}>
+                    <StyledTableCell align="center" style={{ color: 'white' }}>
                       {Math.trunc(row.outerRadius * 100)}
                     </StyledTableCell>
                   </StyledTableRow>
                 ))
               : //Targets
-                data.targets.map((row) => (
+                dataHook.targets.map((row) => (
                   <StyledTableRow
                     key={row.label}
                     style={{
                       backgroundColor:
                         selectedRow?.label === row.label
-                          ? "rgb(0, 189, 88)"
-                          : "rgb(82, 82, 82)",
+                          ? 'rgb(0, 189, 88)'
+                          : 'rgb(82, 82, 82)',
                     }}
                   >
-                    <StyledTableCell style={{ color: "white" }} align="center">
+                    <StyledTableCell style={{ color: 'white' }} align="center">
                       {row.label}
                     </StyledTableCell>
-                    <StyledTableCell style={{ color: "white" }} align="center">
+                    <StyledTableCell style={{ color: 'white' }} align="center">
                       {row.angle}
                     </StyledTableCell>
-                    <StyledTableCell style={{ color: "white" }} align="center">
+                    <StyledTableCell style={{ color: 'white' }} align="center">
                       {row.radius * 100}
                     </StyledTableCell>
                   </StyledTableRow>
