@@ -87,7 +87,6 @@ export default function MinimumDistanceSlider() {
       outerRadius: outerRadius,
     };
 
-    console.log(newSelectedRow);
     const objetoExistenteIndex = currentData.sections.findIndex(
       (obj) => obj.label === newSelectedRow.label
     );

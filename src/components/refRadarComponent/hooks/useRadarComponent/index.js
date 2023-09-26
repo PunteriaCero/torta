@@ -1,7 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { saveItem, saveSections } from '../../../../redux/slices/dataSlice';
-import { useDataSelector } from '../../../../redux/hooks/dataHooks';
+import {
+  useSectionsSelector,
+  useTargetsSelector,
+} from '../../../../redux/hooks/dataHooks';
 
 export const useRadarComponent = ({
   config: {
@@ -49,10 +52,10 @@ export const useRadarComponent = ({
   svgRef,
 }) => {
   const dispatch = useDispatch();
-
-  const data = useDataSelector();
-  const [sectionsData, setSectionsData] = useState(data.sections);
-  const [targetsData, settTargetsData] = useState(data.targets);
+  const sectionsRedux = useSectionsSelector();
+  const targetsRedux = useTargetsSelector();
+  //const [sectionsData, setSectionsData] = useState(data.sections);
+  //const [targetsData, settTargetsData] = useState(data.targets);
   const [selectedAngle, setSelectedAngle] = useState(true);
   const [positionClick, setPositionClick] = useState(0);
   const width = radius * 2;
@@ -83,32 +86,32 @@ export const useRadarComponent = ({
 
     // Calcular el ángulo en radianes
 
-    const newSectionsData = updateSelectedState(sectionsData, d.data.label);
+    const newSectionsData = updateSelectedState(sectionsRedux, d.data.label);
 
-    if (targetsData) {
-      const newTargetsData = updateSelectedState(targetsData, null); // Unselect all targets
-      settTargetsData(newTargetsData);
+    if (targetsRedux) {
+      const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
+      //settTargetsData(newTargetsData);
     }
     const newSection = newSectionsData.find(
       (section) => section.selected === true
     );
     dispatch(saveItem(newSection));
     dispatch(saveSections(newSectionsData));
-    setSectionsData(newSectionsData);
+    //setSectionsData(newSectionsData);
   };
 
   const handleSectionDoubleClick = (event, d) => {};
 
   const handleTargetsClick = (event, d) => {
-    const newTargetsData = updateSelectedState(targetsData, d.data.label);
-    if (sectionsData) {
-      const newSectionsData = updateSelectedState(sectionsData, null); // Unselect all sections
-      setSectionsData(newSectionsData);
+    const newTargetsData = updateSelectedState(targetsRedux, d.data.label);
+    if (sectionsRedux) {
+      const newSectionsData = updateSelectedState(sectionsRedux, null); // Unselect all sections
+      //setSectionsData(newSectionsData);
     }
     dispatch(
       saveItem(newTargetsData.find((section) => section.selected === true))
     );
-    settTargetsData(newTargetsData);
+    // settTargetsData(newTargetsData);
   };
 
   useEffect(() => {
@@ -161,7 +164,7 @@ export const useRadarComponent = ({
     };
     // console.log("obj input", obj);
     // Calcula el ángulo de inicio ajustado
-    const newSections = sectionsData.map((section, index) => {
+    const newSections = sectionsRedux.map((section, index) => {
       //agregar index a data
       return {
         ...section,
@@ -171,7 +174,9 @@ export const useRadarComponent = ({
           index === d.index && !selectedAngle ? obj.deg : section.endAngle,
       };
     });
-    setSectionsData(newSections);
+
+    dispatch(saveSections(newSections));
+    //setSectionsData(newSections);
     // El ángulo en radianes ahora está almacenado en 'angleInRadians'
   };
   return {

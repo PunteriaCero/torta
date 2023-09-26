@@ -114,7 +114,6 @@ function RadarComponent({ config }) {
       .value((d) => d.value)
       .sort(null);
     // Si existen sections se renderizan en el radar
-    console.log(sectionsData);
     if (sectionsData) {
       // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
       const sections = svg
