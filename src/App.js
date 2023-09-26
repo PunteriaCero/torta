@@ -17,9 +17,6 @@ function App() {
   const dataRedux = useDataSelector();
   const [selectedRow, setSelectedRow] = useState();
   const [currentData, setCurrentData] = useState(dataRedux);
-  const onClick = (row) => {
-    setSelectedRow(row);
-  };
 
   const [disabled, setDisabled] = useState(false);
 
@@ -65,14 +62,13 @@ function App() {
           >
             Change Mode
           </Button>
-          <DataTable onClick={onClick} />
+          <DataTable />
           <div style={{ visibility: disabled ? 'hidden' : 'visible' }}>
             {selectedRow ? <Slider key={JSON.stringify(selectedRow)} /> : null}
           </div>
         </div>
         <RadarComponent
           key={JSON.stringify(currentData)}
-          onClick={onClick}
           config={{
             radius: '280',
             colorCircles: 'rgb(0, 189, 88)',

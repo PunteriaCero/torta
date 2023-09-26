@@ -4,7 +4,6 @@ import { saveItem, saveSections } from '../../../../redux/slices/dataSlice';
 import { useDataSelector } from '../../../../redux/hooks/dataHooks';
 
 export const useRadarComponent = ({
-  onClick,
   config: {
     radius = 200,
     numCircles = 9,
@@ -110,8 +109,6 @@ export const useRadarComponent = ({
       saveItem(newTargetsData.find((section) => section.selected === true))
     );
     settTargetsData(newTargetsData);
-    // const newSelectedTarget = { ...d.data, selected: true };
-    // onClick(newSelectedTarget);
   };
 
   useEffect(() => {

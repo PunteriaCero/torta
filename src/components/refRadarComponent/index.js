@@ -8,11 +8,11 @@ import {
   useTargetsSelector,
 } from '../../redux/hooks/dataHooks';
 
-function RadarComponent({ onClick, config }) {
+function RadarComponent({ config }) {
   const svgRef = useRef(null);
   const sectionsData = useSectionsSelector();
   const targetsData = useTargetsSelector();
-  const initialConfig = useRadarComponent({ onClick, config, svgRef });
+  const initialConfig = useRadarComponent({ config, svgRef });
   const radarConfigRef = useRef(initialConfig);
   const { northColor, northFontSize, radius, north } = radarConfigRef.current;
   const styles = {
@@ -44,7 +44,6 @@ function RadarComponent({ onClick, config }) {
       colorLines,
       strokeCircles,
       opacity,
-
       sectionLabelFontSize,
       sectionLabelFontWeight,
       sectionLabelDefaultColor,
