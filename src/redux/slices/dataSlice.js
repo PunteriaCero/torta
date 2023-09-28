@@ -6,6 +6,7 @@ const initialState = {
   sections: data.sections,
   targets: [],
   item: null,
+  isResizing: false,
 };
 
 const dataSlice = createSlice({
@@ -28,10 +29,19 @@ const dataSlice = createSlice({
       const sortedSections = [...state.sections].sort(compareByEndElevation);
       return { ...state, sections: sortedSections };
     },
+    changeIsResizing: (state, { payload }) => {
+      return { ...state, isResizing: payload };
+    },
   },
 });
 
-export const { saveData, saveSections, saveTargets, sortSections, saveItem } =
-  dataSlice.actions;
+export const {
+  saveData,
+  saveSections,
+  saveTargets,
+  saveItem,
+  sortSections,
+  changeIsResizing,
+} = dataSlice.actions;
 
 export default dataSlice.reducer;

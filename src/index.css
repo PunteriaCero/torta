@@ -11,3 +11,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+circle.resizeHandle {
+  fill: rgb(0, 255, 128);
+  cursor: nwse-resize;
+  z-index: 9999999999999;
+}
+circle.detectCoordinate {
+  fill: rgb(230, 0, 255);
+  cursor: nwse-resize;
+  z-index: 9999999999999;
+}

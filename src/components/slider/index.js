@@ -42,7 +42,7 @@ export default function MinimumDistanceSlider() {
       }
     } else {
       setValue1(newValue);
-    }
+    } 
 
     onChange(newValues);
   };

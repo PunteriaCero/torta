@@ -1,15 +1,18 @@
 import React, { useRef, useEffect } from 'react';
-import * as d3 from 'd3';
-
 import { BaseCircles, BaseLines } from './utils';
 import useRadarComponent from './hooks/useRadarComponent';
 import {
+  useItemSelector,
   useSectionsSelector,
   useTargetsSelector,
 } from '../../redux/hooks/dataHooks';
+import * as d3 from 'd3';
+import { useDispatch } from 'react-redux';
+import { saveItem, saveSections } from '../../redux/slices/dataSlice';
 
 function RadarComponent({ config }) {
   const svgRef = useRef(null);
+  const dispatch = useDispatch();
   const sectionsData = useSectionsSelector();
   const targetsData = useTargetsSelector();
   const initialConfig = useRadarComponent({ config, svgRef });
@@ -25,11 +28,17 @@ function RadarComponent({ config }) {
     },
   };
 
+  let selectedSlice = useItemSelector();
+  let isResizing = false;
+
   useEffect(() => {
     const {
       handleSectionClick,
       handleSectionDoubleClick,
       handleTargetsClick,
+      handleMouseDown,
+      handleMouseUp,
+      handleMouseMove,
       handleSectionDragEnd,
       handleSectionDragStart,
       handleSectionDrag,
@@ -81,24 +90,15 @@ function RadarComponent({ config }) {
       .append('g')
       .attr('transform', `translate(${width / 2}, ${height / 2})`);
 
-    svg.on('click', (event) => {
-      //console.log('event', event);
-    });
-
-    // const element = svg.current;
-
     // Generar circulos
-
     BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
-
     const lineAngles = d3.range(numLines).map((i) => {
       // console.log("i", i);
       return ((i * 360) / numLines) * (Math.PI / 180);
     });
 
-    // console.log("line angles", lineAngles);
     BaseLines({
       lineAngles,
       radius,
@@ -113,6 +113,7 @@ function RadarComponent({ config }) {
       .pie()
       .value((d) => d.value)
       .sort(null);
+
     // Si existen sections se renderizan en el radar
     if (sectionsData) {
       // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
@@ -120,7 +121,13 @@ function RadarComponent({ config }) {
         .selectAll('.arc')
         .data(pie(sectionsData))
         .enter()
-        .append('g');
+        .append('g')
+        .on('mousedown', handleMouseDown)
+        .on('mouseup', handleMouseUp)
+        .on('mousemove', handleMouseMove)
+        .on('click', handleSectionClick)
+        .on('dblclick', handleSectionDoubleClick);
+
       // Definir un generador de arco para las secciones
       const path = d3
         .arc()
@@ -200,11 +207,10 @@ function RadarComponent({ config }) {
         .style('filter', (d) =>
           d.data.selected ? '' : unSelectedSectionLabelShadow
         );
-
       // Establecer manejadores de eventos de clic para las secciones y los puntos
-      sections
-        .on('click', handleSectionClick)
-        .on('dblclick', handleSectionDoubleClick);
+      // sections
+      //   .on('click', handleSectionClick)
+      //   .on('dblclick', handleSectionDoubleClick);
 
       // sections.call(
       //   d3
