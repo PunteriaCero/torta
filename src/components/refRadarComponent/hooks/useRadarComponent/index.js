@@ -68,18 +68,6 @@ export const useRadarComponent = ({
     dataArray.map((data) => ({ ...data, selected: data.label === label }));
 
   const handleSectionClick = (event, d) => {
-    // d.data.startAngle = d.data.startAngle - 1;
-    // console.log(
-    //   d.data.startAngle > d.data.endAngle
-    //     ? (d.data.startAngle - 360) * (Math.PI / 180)
-    //     : d.data.startAngle * (Math.PI / 180),
-    //   d.data.endAngle * (Math.PI / 180)
-    // );
-
-    // const svg = d3.select(svgRef.current);
-    // console.log("width", width);
-    // console.log("height", height);
-    // console.log("position x", event.x,d);
     const centerX = width / 2; // Ancho del gráfico dividido por 2
     const centerY = height / 2; // Alto del gráfico dividido por 2
     const x = event.x - centerX; // Distancia horizontal desde el centro
@@ -107,10 +95,6 @@ export const useRadarComponent = ({
     const newSelectedTarget = { ...d.data, selected: true };
     onClick(newSelectedTarget);
   };
-
-  useEffect(() => {
-    selectedAngleRef.current = selectedAngle;
-  }, [selectedAngle]);
 
   const handleSectionDragStart = (event, d) => {
     const rad = Math.atan2(event.y, event.x);
@@ -140,10 +124,6 @@ export const useRadarComponent = ({
     // Calcular el ángulo en radianes
     const x = event.x - width / 2;
     const y = height / 2 - event.y;
-    console.log(selectedAngleRef.current);
-    // Calcula el ángulo actual basado en las coordenadas del mouse
-    // const currentAngle = (Math.atan2(y, x) * 180) / Math.PI;
-    // const angleDifference = currentAngle - d.startAngle;
     const rad = Math.atan2(event.y, event.x);
     const deg = rad * (180 / Math.PI) + 90;
     const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
@@ -172,12 +152,39 @@ export const useRadarComponent = ({
     // El ángulo en radianes ahora está almacenado en 'angleInRadians'
   };
 
+  const handleTargetDragEnd = (event, d) => {
+    const x = event.x - width / 2;
+    const y = height / 2 - event.y;
+    const rad = Math.atan2(event.y, event.x);
+    const deg = rad * (180 / Math.PI) + 90;
+    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    const hpMax = svgRef.current.getBoundingClientRect().width / 2;
+    const radie = hp / hpMax;
+    const obj = {
+      rad: rad,
+      deg: deg,
+      x: event.x,
+      y: event.y,
+      radie: radie,
+    };
+
+    const newTargets = targetsData.map((target, index) => {
+      return {
+        ...target,
+        angle: index === d.index ? obj.deg : target.angle,
+        radius: index === d.index ? obj.radie : target.radius,
+      };
+    });
+    settTargetsData(newTargets);
+  };
+
   return {
     handleSectionClick,
     handleTargetsClick,
     handleSectionDragEnd,
     handleSectionDragStart,
     handleSectionDrag,
+    handleTargetDragEnd,
     targetsData,
     sectionsData,
     width,

@@ -26,6 +26,7 @@ function RadarComponent({ data, onClick, config }) {
       handleSectionDragEnd,
       handleSectionDragStart,
       handleSectionDrag,
+      handleTargetDragEnd,
       targetsData,
       sectionsData,
       width,
@@ -280,6 +281,12 @@ function RadarComponent({ data, onClick, config }) {
         .style("cursor", "pointer")
         .style("fill", pointLabelTextColor);
       point.on("click", handleTargetsClick);
+      point.call(
+        d3
+          .drag()
+          .on("start", () => console.log("what"))
+          .on("end", handleTargetDragEnd)
+      );
     }
 
     // Función de limpieza para eliminar todos los elementos del SVG al desmontar el componente
