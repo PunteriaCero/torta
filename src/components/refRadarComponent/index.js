@@ -8,11 +8,9 @@ import {
 } from '../../redux/hooks/dataHooks';
 import * as d3 from 'd3';
 import { useDispatch } from 'react-redux';
-import { saveItem, saveSections } from '../../redux/slices/dataSlice';
 
 function RadarComponent({ config }) {
-  const svgRef = useRef(null);
-  const dispatch = useDispatch();
+  const svgRef = useRef(null); 
   const sectionsData = useSectionsSelector();
   const targetsData = useTargetsSelector();
   const initialConfig = useRadarComponent({ config, svgRef });
@@ -25,16 +23,12 @@ function RadarComponent({ config }) {
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: 'calc(10px + 2vmin)',
+      zIndex: 1000,
     },
   };
-
-  let selectedSlice = useItemSelector();
-  let isResizing = false;
-
   useEffect(() => {
     const {
       handleSectionClick,
-      handleSectionDoubleClick,
       handleTargetsClick,
       handleMouseDown,
       handleMouseUp,
@@ -107,7 +101,6 @@ function RadarComponent({ config }) {
       opacityLines,
       svg,
     });
-
     // Crear un generador de pie
     const pie = d3
       .pie()
@@ -122,11 +115,7 @@ function RadarComponent({ config }) {
         .data(pie(sectionsData))
         .enter()
         .append('g')
-        .on('mousedown', handleMouseDown)
-        .on('mouseup', handleMouseUp)
-        .on('mousemove', handleMouseMove)
-        .on('click', handleSectionClick)
-        .on('dblclick', handleSectionDoubleClick);
+        .on('click', handleSectionClick);
 
       // Definir un generador de arco para las secciones
       const path = d3
@@ -144,6 +133,7 @@ function RadarComponent({ config }) {
 
       // Obtén las coordenadas del extremo superior izquierdo del SVG
       const svgBounds = svgElement.getBoundingClientRect();
+
       // Agregar elementos de tipo "path" para las secciones
       sections
         .append('path')
@@ -208,17 +198,15 @@ function RadarComponent({ config }) {
           d.data.selected ? '' : unSelectedSectionLabelShadow
         );
       // Establecer manejadores de eventos de clic para las secciones y los puntos
-      // sections
-      //   .on('click', handleSectionClick)
-      //   .on('dblclick', handleSectionDoubleClick);
-
-      // sections.call(
-      //   d3
-      //     .drag()
-      //     .on('start', handleSectionDragStart)
-      //     .on('drag', handleSectionDrag)
-      //     .on('end', handleSectionDragEnd)
-      // );
+      sections.on('dblclick', () => {
+        setTimeout(() => {
+          console.log('dblclick');
+          const svg2 = d3.select(svgElement);
+          svg2.on('mousedown', handleMouseDown);
+          svg2.on('mouseup', handleMouseUp);
+          svg2.on('mousemove', handleMouseMove);
+        }, 400);
+      });
     }
 
     // Si existen targets se renderizan en el radar

@@ -1,13 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import {
-  changeIsResizing,
-  saveItem,
-  saveSections,
-} from '../../../../redux/slices/dataSlice';
+import { saveItem, saveSections } from '../../../../redux/slices/dataSlice';
 import {
   useItemSelector,
-  useResizeSelector,
   useSectionsSelector,
   useTargetsSelector,
 } from '../../../../redux/hooks/dataHooks';
@@ -63,10 +58,12 @@ export const useRadarComponent = ({
   const sectionsRedux = useSectionsSelector();
   const targetsRedux = useTargetsSelector();
   let selectedSlice = useItemSelector();
+  //const isResizing = useResizeSelector();
   //const [sectionsData, setSectionsData] = useState(data.sections);
   //const [targetsData, settTargetsData] = useState(data.targets);
   const [selectedAngle, setSelectedAngle] = useState(true);
   const [positionClick, setPositionClick] = useState(0);
+  const [angleCustom, setAngleCustom] = useState(0);
   const width = radius * 2;
   const height = width;
   const selectedAngleRef = useRef(selectedAngle);
@@ -76,66 +73,55 @@ export const useRadarComponent = ({
     dataArray.map((data) => ({ ...data, selected: data.label === label }));
 
   const handleSectionClick = (event, d) => {
-    console.log(d);
-    event.stopPropagation();
-    const newSectionsData = updateSelectedState(sectionsRedux, d.data.label);
+    setTimeout(() => {
+      event.stopPropagation();
+      const newSectionsData = updateSelectedState(sectionsRedux, d.data.label);
 
-    if (targetsRedux) {
-      const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
-      //settTargetsData(newTargetsData);
-    }
-    const newSection = newSectionsData.find(
-      (section) => section.selected === true
-    );
-    dispatch(saveItem(newSection));
-    dispatch(saveSections(newSectionsData));
+      if (targetsRedux) {
+        const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
+        //settTargetsData(newTargetsData);
+      }
+      const newSection = newSectionsData.find(
+        (section) => section.selected === true
+      );
+      dispatch(saveItem(newSection));
+      dispatch(saveSections(newSectionsData));
+    }, 300);
 
-    // d3.select(svgRef.current)
-    //   .append('circle')
-    //   .attr('class', 'detectCoordinate')
-    //   .attr('cx', 280)
-    //   .attr('cy', 280)
-    //   .attr('r', 15);
-    // //2
-    // d3.select(svgRef.current)
-    //   .append('circle')
-    //   .attr('class', 'resizeHandle')
-    //   .attr('cx', 147) // 210 angle
-    //   .attr('cy', 520) // 339 angle
-    //   .attr('r', 7);
-    // //1
-    // d3.select(svgRef.current)
-    //   .append('circle')
-    //   .attr('class', 'resizeHandle')
-    //   .attr('cx', 330) // 12 angle
-    //   .attr('cy', 35) // 49 angle
-    //   .attr('r', 7);
+    /* d3.select(svgRef.current)
+      .append('circle')
+      .attr('class', 'detectCoordinate')
+      .attr('cx', 280)
+      .attr('cy', 280)
+      .attr('r', 15);
+    //2
+    d3.select(svgRef.current)
+      .append('circle')
+      .attr('class', 'resizeHandle')
+      .attr('cx', 147) // 210 angle
+      .attr('cy', 520) // 339 angle
+      .attr('r', 7);
+    //1
+    d3.select(svgRef.current)
+      .append('circle')
+      .attr('class', 'resizeHandle')
+      .attr('cx', 330) // 12 angle
+      .attr('cy', 35) // 49 angle
+      .attr('r', 7);
 
-    // d3.select(svgRef.current)
-    //   .append('circle')
-    //   .attr('class', 'resizeHandle')
-    //   .attr('cx', 488)
-    //   .attr('cy', 105)
-    //   .attr('r', 7);
+    d3.select(svgRef.current)
+      .append('circle')
+      .attr('class', 'resizeHandle')
+      .attr('cx', 488)
+      .attr('cy', 105)
+      .attr('r', 7);
 
-    // d3.select(svgRef.current)
-    //   .append('circle')
-    //   .attr('class', 'resizeHandle')
-    //   .attr('cx', 520)
-    //   .attr('cy', 150)
-    //   .attr('r', 7);
-  };
-
-  const handleSectionDoubleClick = (event, d) => {
-    event.stopPropagation();
-    console.log('event: ' + event);
-    // d3.select(svgRef.current).call(
-    //   d3
-    //     .drag()
-    //     .on('start', handleSectionDragStart)
-    //     .on('drag', handleSectionDrag)
-    //     .on('end', handleSectionDragEnd)
-    // );
+    d3.select(svgRef.current)
+      .append('circle')
+      .attr('class', 'resizeHandle')
+      .attr('cx', 520)
+      .attr('cy', 150)
+      .attr('r', 7);*/
   };
 
   const handleTargetsClick = (event, d) => {
@@ -156,18 +142,20 @@ export const useRadarComponent = ({
     const deg = rad * (180 / Math.PI) + 90;
     setPositionClick(deg);
     const currentSelectedAngle = selectedAngleRef.current;
-
     const currentPositionClick = positionClickRef.current;
+
     console.log(
       rad,
       d.data.endElevation * (Math.PI / 180),
       d.data.startAngle * (Math.PI / 180)
     );
+
     const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
 
     if (d.data.endAngle - deg < deg - d.data.startAngle) {
       setSelectedAngle(false);
     }
+
     if (d.data.endAngle - deg > deg - d.data.startAngle) {
       setSelectedAngle(true);
     }
@@ -177,41 +165,31 @@ export const useRadarComponent = ({
 
   const handleSectionDragEnd = (event, d) => {
     console.log('dragEnd', event, d);
-    // Calcular el ángulo en radianes
-    // const x = event.x - width / 2;
-    // const y = height / 2 - event.y;
-    // console.log(selectedAngleRef.current);
-    // // Calcula el ángulo actual basado en las coordenadas del mouse
-    // // const currentAngle = (Math.atan2(y, x) * 180) / Math.PI;
-    // // const angleDifference = currentAngle - d.startAngle;
-    // const rad = Math.atan2(event.y, event.x);
-    // const deg = rad * (180 / Math.PI) + 90;
-    // const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
-    // const hpMax = svgRef.current.getBoundingClientRect().width / 2;
-    // const radie = hp / hpMax;
-    // const obj = {
-    //   rad: rad,
-    //   deg: deg,
-    //   x: event.x,
-    //   y: event.y,
-    //   radie: radie,
-    // };
-    // // console.log("obj input", obj);
-    // // Calcula el ángulo de inicio ajustado
-    // const newSections = sectionsRedux.map((section, index) => {
-    //   //agregar index a data
-    //   return {
-    //     ...section,
-    //     startAngle:
-    //       index === d.index && selectedAngle ? obj.deg : section.startAngle,
-    //     endAngle:
-    //       index === d.index && !selectedAngle ? obj.deg : section.endAngle,
-    //   };
-    // });
+    const rad = Math.atan2(event.y, event.x);
+    const deg = rad * (180 / Math.PI) + 90;
+    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    const hpMax = svgRef.current.getBoundingClientRect().width / 2;
+    const radie = hp / hpMax;
 
-    // dispatch(saveSections(newSections));
-    //setSectionsData(newSections);
-    // El ángulo en radianes ahora está almacenado en 'angleInRadians'
+    const obj = {
+      rad: rad,
+      deg: deg,
+      x: event.x,
+      y: event.y,
+      radie: radie,
+    };
+
+    const newSections = sectionsRedux.map((section, index) => {
+      return {
+        ...section,
+        startAngle:
+          index === d.index && selectedAngle ? obj.deg : section.startAngle,
+        endAngle:
+          index === d.index && !selectedAngle ? obj.deg : section.endAngle,
+      };
+    });
+
+    dispatch(saveSections(newSections));
   };
 
   const handleMouseDown = (event, d) => {
@@ -223,40 +201,29 @@ export const useRadarComponent = ({
   };
 
   const handleMouseMove = (event, d) => {
-    if (isResizing && selectedSlice) {
+    if (isResizing) {
       const [x, y] = d3.pointer(event);
-
       const angle = Math.atan2(y - height / 2, x - width / 2);
-      let degrees = (angle * 180) / Math.PI;
+      let degrees = (angle * 180) / Math.PI + 90;
 
       if (degrees < 0) {
         degrees += 360;
       }
 
-      console.log('Mouse angle in degrees:', degrees);
-      // const rad = Math.atan2(event.y, event.x);
-      // const deg = rad * (180 / Math.PI) + 90;
-      // const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
-      // const hpMax = svgRef.current.getBoundingClientRect().width / 2;
-      // const radie = hp / hpMax;
-      // const obj = {
-      //   rad: rad,
-      //   deg: deg,
-      //   x: event.x,
-      //   y: event.y,
-      //   radie: radie,
-      // };
-      // // selectedSlice = { ...selectedSlice, endAngle: obj.deg };
-
-      // // dispatch(saveItem(selectedSlice));
       let newSectionsData = sectionsRedux.map((item) => {
         if (item.selected) {
-          return { ...item, endAngle: degrees };
+          return { ...item, startAngle: degrees };
         } else {
           return item;
         }
       });
       dispatch(saveSections(newSectionsData));
+
+      selectedSlice = { ...selectedSlice, startAngle: degrees };
+
+      dispatch(saveItem(selectedSlice));
+
+      console.log('Mouse angle in degrees:', degrees);
     }
   };
 
@@ -266,7 +233,6 @@ export const useRadarComponent = ({
 
   return {
     handleSectionClick,
-    handleSectionDoubleClick,
     handleTargetsClick,
     handleMouseDown,
     handleMouseUp,

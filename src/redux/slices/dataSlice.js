@@ -7,6 +7,7 @@ const initialState = {
   targets: [],
   item: null,
   isResizing: false,
+  newAngle: 0,
 };
 
 const dataSlice = createSlice({
@@ -32,6 +33,9 @@ const dataSlice = createSlice({
     changeIsResizing: (state, { payload }) => {
       return { ...state, isResizing: payload };
     },
+    changeAngle: (state, { payload }) => {
+      return { ...state, newAngle: payload };
+    },
   },
 });
 
@@ -42,6 +46,7 @@ export const {
   saveItem,
   sortSections,
   changeIsResizing,
+  changeAngle,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
