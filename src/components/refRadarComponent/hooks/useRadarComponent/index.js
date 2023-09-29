@@ -1,58 +1,59 @@
-import { useRef, useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useRef, useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import {
   changeIsResizing,
   saveItem,
   saveSections,
-} from '../../../../redux/slices/dataSlice';
+  saveTargets,
+} from "../../../../redux/slices/dataSlice";
 import {
   useItemSelector,
   useResizeSelector,
   useSectionsSelector,
   useTargetsSelector,
-} from '../../../../redux/hooks/dataHooks';
-import * as d3 from 'd3';
+} from "../../../../redux/hooks/dataHooks";
+import * as d3 from "d3";
 
 export const useRadarComponent = ({
   config: {
     radius = 200,
     numCircles = 9,
-    colorCircles = 'green',
+    colorCircles = "green",
     numLines = 24,
     opacityLines = 0.3,
     strokeLines = 1,
-    colorLines = 'green',
+    colorLines = "green",
     circleStroke = 3,
-    north = 'N',
-    northColor = 'rgb(9, 115, 9)',
+    north = "N",
+    northColor = "rgb(9, 115, 9)",
     northFontSize = (radius) => radius * 0.06,
     opacity = 0.4,
     sectionLabelFontSize = (radius) => radius * 0.06,
-    sectionLabelFontWeight = 'bold',
-    sectionLabelDefaultColor = 'rgb(100, 100, 100)',
-    sectionLabelSelectedColor = 'whitesmoke',
-    selectedSectiondropShadowFilter = 'drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.6))',
-    unSelectedSectiondropShadowFilter = 'drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))',
+    sectionLabelFontWeight = "bold",
+    sectionLabelDefaultColor = "rgb(100, 100, 100)",
+    sectionLabelSelectedColor = "whitesmoke",
+    selectedSectiondropShadowFilter = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.6))",
+    unSelectedSectiondropShadowFilter = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))",
     sectionRectWidth = (radius) => radius * 0.08,
     sectionRectHeight = (radius) => radius * 0.08,
     sectionBorderStroke = (radius) => radius * 0.01,
-    sectionStrokeColor = 'white',
+    sectionStrokeColor = "white",
     sectionRecBorderSrtoke = (radius) => radius * 0.005,
-    unselecteSectionRecColor = 'white',
-    selectedSectionRecBorderColor = 'black',
-    unselectedSectionRecBorderColor = 'black',
-    unSelectedSectionLabelShadow = 'drop-shadow(0px 0px 0.7px rgba(0, 0, 0, 1))',
+    unselecteSectionRecColor = "white",
+    selectedSectionRecBorderColor = "black",
+    unselectedSectionRecBorderColor = "black",
+    unSelectedSectionLabelShadow = "drop-shadow(0px 0px 0.7px rgba(0, 0, 0, 1))",
     pointLabelFontSize = (radius) => radius * 0.06,
-    pointLabelFontWeight = 'bold',
-    pointLabelTextColor = 'whitesmoke',
-    pointLabelTextShadow = '0 0 1px black, 0 0 1px black',
+    pointLabelFontWeight = "bold",
+    pointLabelTextColor = "whitesmoke",
+    pointLabelTextShadow = "0 0 1px black, 0 0 1px black",
     pointRectWidth = (radius) => radius * 0.04,
     pointRectHeight = (radius) => radius * 0.04,
     pointBorderStroke = 1.4,
     selectedPointRectborderShadow = (color) =>
       `drop-shadow(0px 0px 3px ${color})`,
-    unSelectedPointRectborderShadow = 'drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))',
-    selectedPointStrokeColor = 'white',
+    unSelectedPointRectborderShadow = "drop-shadow(0px 1.5px 1.5px rgba(0, 0, 0, 0.5))",
+    selectedPointStrokeColor = "white",
     pointRectRx = (radius) => radius * 0.08,
     pointRectRy = (radius) => radius * 0.08,
   },
@@ -128,7 +129,7 @@ export const useRadarComponent = ({
 
   const handleSectionDoubleClick = (event, d) => {
     event.stopPropagation();
-    console.log('event: ' + event);
+    console.log("event: " + event);
     // d3.select(svgRef.current).call(
     //   d3
     //     .drag()
@@ -145,7 +146,7 @@ export const useRadarComponent = ({
       //setSectionsData(newSectionsData);
     }
     dispatch(
-      saveItem(newTargetsData.find((section) => section.selected === true))
+      saveItem(newTargetsData.find((target) => target.selected === true))
     );
     // settTargetsData(newTargetsData);
   };
@@ -176,7 +177,7 @@ export const useRadarComponent = ({
   const handleSectionDrag = (event, d) => {};
 
   const handleSectionDragEnd = (event, d) => {
-    console.log('dragEnd', event, d);
+    console.log("dragEnd", event, d);
     // Calcular el ángulo en radianes
     // const x = event.x - width / 2;
     // const y = height / 2 - event.y;
@@ -213,6 +214,22 @@ export const useRadarComponent = ({
     //setSectionsData(newSections);
     // El ángulo en radianes ahora está almacenado en 'angleInRadians'
   };
+  const handleTargetDragEnd = (event, d) => {
+    const rad = Math.atan2(event.y, event.x);
+    const deg = rad * (180 / Math.PI) + 90;
+    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    const hpMax = svgRef.current.getBoundingClientRect().width / 2;
+    const radius = hp / hpMax;
+
+    const newTargets = targetsRedux.map((target, index) => {
+      return {
+        ...target,
+        angle: index === d.index ? deg : target.angle,
+        radius: index === d.index ? radius : target.radius,
+      };
+    });
+    dispatch(saveTargets(newTargets));
+  };
 
   const handleMouseDown = (event, d) => {
     isResizing = true;
@@ -233,7 +250,7 @@ export const useRadarComponent = ({
         degrees += 360;
       }
 
-      console.log('Mouse angle in degrees:', degrees);
+      console.log("Mouse angle in degrees:", degrees);
       // const rad = Math.atan2(event.y, event.x);
       // const deg = rad * (180 / Math.PI) + 90;
       // const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
@@ -260,10 +277,6 @@ export const useRadarComponent = ({
     }
   };
 
-  useEffect(() => {
-    selectedAngleRef.current = selectedAngle;
-  }, [selectedAngle]);
-
   return {
     handleSectionClick,
     handleSectionDoubleClick,
@@ -274,6 +287,7 @@ export const useRadarComponent = ({
     handleSectionDragEnd,
     handleSectionDragStart,
     handleSectionDrag,
+    handleTargetDragEnd,
     width,
     height,
     radius,
