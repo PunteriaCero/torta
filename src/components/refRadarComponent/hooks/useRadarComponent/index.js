@@ -1,6 +1,11 @@
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { saveItem, saveSections } from '../../../../redux/slices/dataSlice';
+import {
+  changeIsResizing,
+  saveItem,
+  saveSections,
+  saveTargets,
+} from '../../../../redux/slices/dataSlice';
 import {
   useItemSelector,
   useSectionsSelector,
@@ -131,7 +136,7 @@ export const useRadarComponent = ({
       //setSectionsData(newSectionsData);
     }
     dispatch(
-      saveItem(newTargetsData.find((section) => section.selected === true))
+      saveItem(newTargetsData.find((target) => target.selected === true))
     );
     // settTargetsData(newTargetsData);
   };
@@ -165,31 +170,65 @@ export const useRadarComponent = ({
 
   const handleSectionDragEnd = (event, d) => {
     console.log('dragEnd', event, d);
+    // Calcular el ángulo en radianes
+    // const x = event.x - width / 2;
+    // const y = height / 2 - event.y;
+    // console.log(selectedAngleRef.current);
+    // // Calcula el ángulo actual basado en las coordenadas del mouse
+    // // const currentAngle = (Math.atan2(y, x) * 180) / Math.PI;
+    // // const angleDifference = currentAngle - d.startAngle;
+    // const rad = Math.atan2(event.y, event.x);
+    // const deg = rad * (180 / Math.PI) + 90;
+    // const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    // const hpMax = svgRef.current.getBoundingClientRect().width / 2;
+    // const radie = hp / hpMax;
+    // const obj = {
+    //   rad: rad,
+    //   deg: deg,
+    //   x: event.x,
+    //   y: event.y,
+    //   radie: radie,
+    // };
+    // // console.log("obj input", obj);
+    // // Calcula el ángulo de inicio ajustado
+    // const newSections = sectionsRedux.map((section, index) => {
+    //   //agregar index a data
+    //   return {
+    //     ...section,
+    //     startAngle:
+    //       index === d.index && selectedAngle ? obj.deg : section.startAngle,
+    //     endAngle:
+    //       index === d.index && !selectedAngle ? obj.deg : section.endAngle,
+    //   };
+    // });
+
+    // const newSections = sectionsRedux.map((section, index) => {
+    //   return {
+    //     ...section,
+    //     startAngle:
+    //       index === d.index && selectedAngle ? obj.deg : section.startAngle,
+    //     endAngle:
+    //       index === d.index && !selectedAngle ? obj.deg : section.endAngle,
+    //   };
+    // });
+
+    // dispatch(saveSections(newSections));
+  };
+  const handleTargetDragEnd = (event, d) => {
     const rad = Math.atan2(event.y, event.x);
     const deg = rad * (180 / Math.PI) + 90;
     const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
     const hpMax = svgRef.current.getBoundingClientRect().width / 2;
-    const radie = hp / hpMax;
+    const radius = hp / hpMax;
 
-    const obj = {
-      rad: rad,
-      deg: deg,
-      x: event.x,
-      y: event.y,
-      radie: radie,
-    };
-
-    const newSections = sectionsRedux.map((section, index) => {
+    const newTargets = targetsRedux.map((target, index) => {
       return {
-        ...section,
-        startAngle:
-          index === d.index && selectedAngle ? obj.deg : section.startAngle,
-        endAngle:
-          index === d.index && !selectedAngle ? obj.deg : section.endAngle,
+        ...target,
+        angle: index === d.index ? deg : target.angle,
+        radius: index === d.index ? radius : target.radius,
       };
     });
-
-    dispatch(saveSections(newSections));
+    dispatch(saveTargets(newTargets));
   };
 
   const handleMouseDown = (event, d) => {
@@ -210,6 +249,8 @@ export const useRadarComponent = ({
         degrees += 360;
       }
 
+      console.log('Mouse angle in degrees:', degrees);
+
       let newSectionsData = sectionsRedux.map((item) => {
         if (item.selected) {
           return { ...item, startAngle: degrees };
@@ -227,10 +268,6 @@ export const useRadarComponent = ({
     }
   };
 
-  useEffect(() => {
-    selectedAngleRef.current = selectedAngle;
-  }, [selectedAngle]);
-
   return {
     handleSectionClick,
     handleTargetsClick,
@@ -240,6 +277,7 @@ export const useRadarComponent = ({
     handleSectionDragEnd,
     handleSectionDragStart,
     handleSectionDrag,
+    handleTargetDragEnd,
     width,
     height,
     radius,
