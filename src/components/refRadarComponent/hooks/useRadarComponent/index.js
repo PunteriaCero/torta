@@ -1,7 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
-  changeIsResizing,
   saveItem,
   saveSections,
   saveTargets,
@@ -93,40 +92,34 @@ export const useRadarComponent = ({
       dispatch(saveSections(newSectionsData));
     }, 300);
 
-    /* d3.select(svgRef.current)
-      .append('circle')
-      .attr('class', 'detectCoordinate')
-      .attr('cx', 280)
-      .attr('cy', 280)
-      .attr('r', 15);
-    //2
-    d3.select(svgRef.current)
-      .append('circle')
-      .attr('class', 'resizeHandle')
-      .attr('cx', 147) // 210 angle
-      .attr('cy', 520) // 339 angle
-      .attr('r', 7);
-    //1
-    d3.select(svgRef.current)
-      .append('circle')
-      .attr('class', 'resizeHandle')
-      .attr('cx', 330) // 12 angle
-      .attr('cy', 35) // 49 angle
-      .attr('r', 7);
+    const svg = d3.select('svg');
 
-    d3.select(svgRef.current)
+    // Create circles for start and end points
+    const startCircle = svg
       .append('circle')
       .attr('class', 'resizeHandle')
-      .attr('cx', 488)
-      .attr('cy', 105)
-      .attr('r', 7);
+      .attr('r', 8); // Adjust the radius as needed
 
-    d3.select(svgRef.current)
+    const endCircle = svg
       .append('circle')
       .attr('class', 'resizeHandle')
-      .attr('cx', 520)
-      .attr('cy', 150)
-      .attr('r', 7);*/
+      .attr('r', 8); // Adjust the radius as needed
+
+    const outerRadius = d.data.outerRadius * 280; // Convert relative radius to actual pixels
+
+    // Calculate start point coordinates
+    const cxStart =
+      280 + outerRadius * Math.cos((d.data.startAngle * Math.PI - 280) / 180);
+    const cyStart =
+      280 + outerRadius * Math.sin((d.data.startAngle * Math.PI - 280) / 180);
+
+    // Calculate end point coordinates
+    const cxEnd =
+      280 + outerRadius * Math.cos((d.data.endAngle * Math.PI - 280) / 180);
+    const cyEnd =
+      280 + outerRadius * Math.sin((d.data.endAngle * Math.PI - 280) / 180);
+    startCircle.attr('cx', cxStart).attr('cy', cyStart);
+    endCircle.attr('cx', cxEnd).attr('cy', cyEnd);
   };
 
   const handleTargetsClick = (event, d) => {
@@ -248,8 +241,6 @@ export const useRadarComponent = ({
       if (degrees < 0) {
         degrees += 360;
       }
-
-      console.log('Mouse angle in degrees:', degrees);
 
       let newSectionsData = sectionsRedux.map((item) => {
         if (item.selected) {
