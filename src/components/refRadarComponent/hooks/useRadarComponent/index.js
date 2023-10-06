@@ -96,34 +96,21 @@ export const useRadarComponent = ({
         d3.select(this).raise(); // Bring the dragged element to the front
       })
       .on('end', function (event) {
-        const angle = Math.atan2(event.y - height / 2, event.x - width / 2);
-        let degrees = (angle * 180) / Math.PI + 90;
-
-        if (degrees < 0) {
-          degrees += 360;
-        }
-
+        const degrees = getDegreesByEvent(event.x, event.y);
         if (d3.select(this).classed(classStart)) {
           selectedSlice = { ...selectedSlice, startAngle: degrees };
-          const { cxStart, cyStart, cxEnd, cyEnd } =
-            getCoordinatesCircles(selectedSlice);
+          const { cxStart, cyStart } = getCoordinatesCircles(selectedSlice);
           const circleStart = d3.select(classSelectStart);
           if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
         } else if (d3.select(this).classed(classEnd)) {
           selectedSlice = { ...selectedSlice, endAngle: degrees };
-          const { cxStart, cyStart, cxEnd, cyEnd } =
-            getCoordinatesCircles(selectedSlice);
+          const { cxEnd, cyEnd } = getCoordinatesCircles(selectedSlice);
           const circleEnd = d3.select(classSelectEnd);
           if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
         }
       })
       .on('drag', function (event) {
-        const angle = Math.atan2(event.y - height / 2, event.x - width / 2);
-        let degrees = (angle * 180) / Math.PI + 90;
-
-        if (degrees < 0) {
-          degrees += 360;
-        }
+        const degrees = getDegreesByEvent(event.x, event.y);
         if (d3.select(this).classed(classStart)) {
           updateReduxAngles(degrees, d.data.label);
           console.log(selectedSlice);
@@ -165,7 +152,6 @@ export const useRadarComponent = ({
       if (!item.selected) {
         const circleElements = d3.selectAll(`.item-${item.label}`).nodes();
         circleElements.forEach((circleElement) => {
-          //d3.select(circleElement).style('display', 'none');
           d3.select(circleElement).remove();
         });
       }
@@ -188,6 +174,16 @@ export const useRadarComponent = ({
       280 + outerRadius * Math.sin((data.endAngle * Math.PI - 280) / 180);
 
     return { cxStart, cyStart, cxEnd, cyEnd };
+  };
+
+  const getDegreesByEvent = (x, y) => {
+    const angle = Math.atan2(y - height / 2, x - width / 2);
+    let degrees = (angle * 180) / Math.PI + 90;
+
+    if (degrees < 0) {
+      degrees += 360;
+    }
+    return degrees;
   };
 
   const updateReduxAngles = (degrees, label, start = true) => {
@@ -329,13 +325,7 @@ export const useRadarComponent = ({
   const handleMouseMove = (event, d) => {
     if (isResizing) {
       const [x, y] = d3.pointer(event);
-      const angle = Math.atan2(y - height / 2, x - width / 2);
-      let degrees = (angle * 180) / Math.PI + 90;
-
-      if (degrees < 0) {
-        degrees += 360;
-      }
-
+      const degrees = getDegreesByEvent(x, y);
       let newSectionsData = sectionsRedux.map((item) => {
         if (item.selected) {
           return { ...item, startAngle: degrees };
