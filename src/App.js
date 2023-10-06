@@ -11,6 +11,7 @@ import {
   sortSections,
 } from './redux/slices/dataSlice';
 import { useDataSelector } from './redux/hooks/dataHooks';
+import * as d3 from 'd3';
 
 function App() {
   const dispatch = useDispatch();
@@ -29,9 +30,18 @@ function App() {
     dispatch(saveItem(selectedData));
   };
 
+  const verifySeletectionSection = () => {
+    const circleElement = d3.select(`#section-${selectedRow?.label}`).node();
+    if (circleElement) {
+      d3.select(circleElement).dispatch('click');
+    }
+  };
+
   useEffect(() => {
     dispatch(sortSections());
     saveSelectedRow();
+    verifySeletectionSection();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRow]);
 

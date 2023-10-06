@@ -77,49 +77,142 @@ export const useRadarComponent = ({
     dataArray.map((data) => ({ ...data, selected: data.label === label }));
 
   const handleSectionClick = (event, d) => {
-    setTimeout(() => {
-      event.stopPropagation();
-      const newSectionsData = updateSelectedState(sectionsRedux, d.data.label);
+    event.stopPropagation();
+    const newSectionsData = updateSelectedState(sectionsRedux, d.data.label);
+    if (targetsRedux) {
+      const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
+      //settTargetsData(newTargetsData);
+    }
+    const newSection = newSectionsData.find(
+      (section) => section.selected === true
+    );
+    dispatch(saveItem(newSection));
+    dispatch(saveSections(newSectionsData));
+    resetCircles(newSectionsData);
 
-      if (targetsRedux) {
-        const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
-        //settTargetsData(newTargetsData);
-      }
-      const newSection = newSectionsData.find(
-        (section) => section.selected === true
-      );
-      dispatch(saveItem(newSection));
-      dispatch(saveSections(newSectionsData));
-    }, 300);
+    const drag = d3
+      .drag()
+      .on('start', function (event) {
+        d3.select(this).raise(); // Bring the dragged element to the front
+      })
+      .on('end', function (event) {
+        const angle = Math.atan2(event.y - height / 2, event.x - width / 2);
+        let degrees = (angle * 180) / Math.PI + 90;
+
+        if (degrees < 0) {
+          degrees += 360;
+        }
+
+        if (d3.select(this).classed(classStart)) {
+          selectedSlice = { ...selectedSlice, startAngle: degrees };
+          const { cxStart, cyStart, cxEnd, cyEnd } =
+            getCoordinatesCircles(selectedSlice);
+          const circleStart = d3.select(classSelectStart);
+          if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
+        } else if (d3.select(this).classed(classEnd)) {
+          selectedSlice = { ...selectedSlice, endAngle: degrees };
+          const { cxStart, cyStart, cxEnd, cyEnd } =
+            getCoordinatesCircles(selectedSlice);
+          const circleEnd = d3.select(classSelectEnd);
+          if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
+        }
+      })
+      .on('drag', function (event) {
+        const angle = Math.atan2(event.y - height / 2, event.x - width / 2);
+        let degrees = (angle * 180) / Math.PI + 90;
+
+        if (degrees < 0) {
+          degrees += 360;
+        }
+        if (d3.select(this).classed(classStart)) {
+          updateReduxAngles(degrees, d.data.label);
+          console.log(selectedSlice);
+        } else if (d3.select(this).classed(classEnd)) {
+          updateReduxAngles(degrees, d.data.label, false);
+        }
+      });
 
     const svg = d3.select('svg');
+    const classStart = `start-circle item-${d.data.label}`;
+    const classEnd = `end-circle item-${d.data.label}`;
+    const classSelectStart = `.start-circle.item-${d.data.label}`;
+    const classSelectEnd = `.end-circle.item-${d.data.label}`;
+    const existCircleStart = d3.select(classSelectStart).node();
+    const existCircleEnd = d3.select(classSelectEnd).node();
 
-    // Create circles for start and end points
-    const startCircle = svg
-      .append('circle')
-      .attr('class', 'resizeHandle')
-      .attr('r', 8); // Adjust the radius as needed
+    const { cxStart, cyStart, cxEnd, cyEnd } = getCoordinatesCircles(d.data);
 
-    const endCircle = svg
-      .append('circle')
-      .attr('class', 'resizeHandle')
-      .attr('r', 8); // Adjust the radius as needed
+    if (!existCircleStart) {
+      const startCircle = svg
+        .append('circle')
+        .attr('class', classStart)
+        .attr('r', 8);
+      startCircle.attr('cx', cxStart).attr('cy', cyStart);
+      startCircle.call(drag);
+    }
+    if (!existCircleEnd) {
+      const endCircle = svg
+        .append('circle')
+        .attr('class', classEnd)
+        .attr('r', 8);
+      endCircle.attr('cx', cxEnd).attr('cy', cyEnd);
+      endCircle.call(drag);
+    }
+  };
 
-    const outerRadius = d.data.outerRadius * 280; // Convert relative radius to actual pixels
+  const resetCircles = (data) => {
+    data.forEach((item) => {
+      if (!item.selected) {
+        const circleElements = d3.selectAll(`.item-${item.label}`).nodes();
+        circleElements.forEach((circleElement) => {
+          //d3.select(circleElement).style('display', 'none');
+          d3.select(circleElement).remove();
+        });
+      }
+    });
+  };
+
+  const getCoordinatesCircles = (data) => {
+    const outerRadius = data.outerRadius * 280; // Convert relative radius to actual pixels
 
     // Calculate start point coordinates
     const cxStart =
-      280 + outerRadius * Math.cos((d.data.startAngle * Math.PI - 280) / 180);
+      280 + outerRadius * Math.cos((data.startAngle * Math.PI - 280) / 180);
     const cyStart =
-      280 + outerRadius * Math.sin((d.data.startAngle * Math.PI - 280) / 180);
+      280 + outerRadius * Math.sin((data.startAngle * Math.PI - 280) / 180);
 
     // Calculate end point coordinates
     const cxEnd =
-      280 + outerRadius * Math.cos((d.data.endAngle * Math.PI - 280) / 180);
+      280 + outerRadius * Math.cos((data.endAngle * Math.PI - 280) / 180);
     const cyEnd =
-      280 + outerRadius * Math.sin((d.data.endAngle * Math.PI - 280) / 180);
-    startCircle.attr('cx', cxStart).attr('cy', cyStart);
-    endCircle.attr('cx', cxEnd).attr('cy', cyEnd);
+      280 + outerRadius * Math.sin((data.endAngle * Math.PI - 280) / 180);
+
+    return { cxStart, cyStart, cxEnd, cyEnd };
+  };
+
+  const updateReduxAngles = (degrees, label, start = true) => {
+    let newSectionsData = updateSelectedState(sectionsRedux, label).map(
+      (item) => {
+        if (item.selected) {
+          if (start) {
+            return { ...item, startAngle: degrees };
+          } else {
+            return { ...item, endAngle: degrees };
+          }
+        } else {
+          return item;
+        }
+      }
+    );
+    dispatch(saveSections(newSectionsData));
+
+    dispatch(
+      saveItem(
+        start
+          ? { ...selectedSlice, startAngle: degrees }
+          : { ...selectedSlice, endAngle: degrees }
+      )
+    );
   };
 
   const handleTargetsClick = (event, d) => {
@@ -207,6 +300,7 @@ export const useRadarComponent = ({
 
     // dispatch(saveSections(newSections));
   };
+
   const handleTargetDragEnd = (event, d) => {
     const rad = Math.atan2(event.y, event.x);
     const deg = rad * (180 / Math.PI) + 90;
@@ -254,8 +348,6 @@ export const useRadarComponent = ({
       selectedSlice = { ...selectedSlice, startAngle: degrees };
 
       dispatch(saveItem(selectedSlice));
-
-      console.log('Mouse angle in degrees:', degrees);
     }
   };
 

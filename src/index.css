@@ -12,7 +12,8 @@ code {
     monospace;
 }
 
-circle.resizeHandle {
+circle.end-circle,
+circle.start-circle {
   fill: rgb(255, 255, 255);
   cursor: nwse-resize;
   position: fixed;

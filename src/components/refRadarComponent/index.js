@@ -113,6 +113,7 @@ function RadarComponent({ config }) {
         .data(pie(sectionsData))
         .enter()
         .append('g')
+        .attr('id', (d) => `section-${d.data.label}`)
         .on('click', handleSectionClick);
 
       // Definir un generador de arco para las secciones
@@ -195,6 +196,8 @@ function RadarComponent({ config }) {
         .style('filter', (d) =>
           d.data.selected ? '' : unSelectedSectionLabelShadow
         );
+
+      
 
       // Establecer manejadores de eventos de clic para las secciones y los puntos
       // sections.on('dblclick', () => {
@@ -285,6 +288,9 @@ function RadarComponent({ config }) {
       svg.selectAll('*').remove();
     };
   }, [initialConfig]);
+
+
+  
 
   return (
     <>
