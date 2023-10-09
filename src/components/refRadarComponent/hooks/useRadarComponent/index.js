@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
+  changeEndAngle,
+  changeStartAngle,
   saveItem,
   saveSections,
   saveTargets,
@@ -61,8 +63,6 @@ export const useRadarComponent = ({
   const dispatch = useDispatch();
   const sectionsRedux = useSectionsSelector();
   const targetsRedux = useTargetsSelector();
-  let selectedSlice = useItemSelector();
-  //const isResizing = useResizeSelector();
   //const [sectionsData, setSectionsData] = useState(data.sections);
   //const [targetsData, settTargetsData] = useState(data.targets);
   const [selectedAngle, setSelectedAngle] = useState(true);
@@ -83,7 +83,7 @@ export const useRadarComponent = ({
       const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
       //settTargetsData(newTargetsData);
     }
-    const newSection = newSectionsData.find(
+    let newSection = newSectionsData.find(
       (section) => section.selected === true
     );
     dispatch(saveItem(newSection));
@@ -98,23 +98,26 @@ export const useRadarComponent = ({
       .on('end', function (event) {
         const degrees = getDegreesByEvent(event.x, event.y);
         if (d3.select(this).classed(classStart)) {
-          selectedSlice = { ...selectedSlice, startAngle: degrees };
-          const { cxStart, cyStart } = getCoordinatesCircles(selectedSlice);
+          newSection = { ...newSection, startAngle: degrees };
+          const { cxStart, cyStart } = getCoordinatesCircles(newSection);
           const circleStart = d3.select(classSelectStart);
           if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
-        } else if (d3.select(this).classed(classEnd)) {
-          selectedSlice = { ...selectedSlice, endAngle: degrees };
-          const { cxEnd, cyEnd } = getCoordinatesCircles(selectedSlice);
+          dispatch(saveItem({ ...newSection, startAngle: degrees }));
+        }
+        if (d3.select(this).classed(classEnd)) {
+          newSection = { ...newSection, endAngle: degrees };
+          const { cxEnd, cyEnd } = getCoordinatesCircles(newSection);
           const circleEnd = d3.select(classSelectEnd);
           if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
+          dispatch(saveItem({ ...newSection, endAngle: degrees }));
         }
       })
       .on('drag', function (event) {
         const degrees = getDegreesByEvent(event.x, event.y);
         if (d3.select(this).classed(classStart)) {
           updateReduxAngles(degrees, d.data.label);
-          console.log(selectedSlice);
-        } else if (d3.select(this).classed(classEnd)) {
+        }
+        if (d3.select(this).classed(classEnd)) {
           updateReduxAngles(degrees, d.data.label, false);
         }
       });
@@ -137,6 +140,7 @@ export const useRadarComponent = ({
       startCircle.attr('cx', cxStart).attr('cy', cyStart);
       startCircle.call(drag);
     }
+
     if (!existCircleEnd) {
       const endCircle = svg
         .append('circle')
@@ -187,28 +191,11 @@ export const useRadarComponent = ({
   };
 
   const updateReduxAngles = (degrees, label, start = true) => {
-    let newSectionsData = updateSelectedState(sectionsRedux, label).map(
-      (item) => {
-        if (item.selected) {
-          if (start) {
-            return { ...item, startAngle: degrees };
-          } else {
-            return { ...item, endAngle: degrees };
-          }
-        } else {
-          return item;
-        }
-      }
-    );
-    dispatch(saveSections(newSectionsData));
-
-    dispatch(
-      saveItem(
-        start
-          ? { ...selectedSlice, startAngle: degrees }
-          : { ...selectedSlice, endAngle: degrees }
-      )
-    );
+    if (start) {
+      dispatch(changeStartAngle({ label, degrees }));
+    } else {
+      dispatch(changeEndAngle({ label, degrees }));
+    }
   };
 
   const handleTargetsClick = (event, d) => {
@@ -326,18 +313,18 @@ export const useRadarComponent = ({
     if (isResizing) {
       const [x, y] = d3.pointer(event);
       const degrees = getDegreesByEvent(x, y);
-      let newSectionsData = sectionsRedux.map((item) => {
-        if (item.selected) {
-          return { ...item, startAngle: degrees };
-        } else {
-          return item;
-        }
-      });
-      dispatch(saveSections(newSectionsData));
+      // let newSectionsData = sectionsRedux.map((item) => {
+      //   if (item.selected) {
+      //     return { ...item, startAngle: degrees };
+      //   } else {
+      //     return item;
+      //   }
+      // });
+      // dispatch(saveSections(newSectionsData));
 
-      selectedSlice = { ...selectedSlice, startAngle: degrees };
+      // selectedSlice = { ...selectedSlice, startAngle: degrees };
 
-      dispatch(saveItem(selectedSlice));
+      // dispatch(saveItem(selectedSlice));
     }
   };
 

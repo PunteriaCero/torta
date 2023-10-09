@@ -30,11 +30,23 @@ const dataSlice = createSlice({
       const sortedSections = [...state.sections].sort(compareByEndElevation);
       return { ...state, sections: sortedSections };
     },
-    changeIsResizing: (state, { payload }) => {
-      return { ...state, isResizing: payload };
+    changeStartAngle: (state, { payload }) => {
+      const { label, degrees } = payload;
+      return {
+        ...state,
+        sections: state.sections.map((item) =>
+          item.label === label ? { ...item, startAngle: degrees } : item
+        ),
+      };
     },
-    changeAngle: (state, { payload }) => {
-      return { ...state, newAngle: payload };
+    changeEndAngle: (state, { payload }) => {
+      const { label, degrees } = payload;
+      return {
+        ...state,
+        sections: state.sections.map((item) =>
+          item.label === label ? { ...item, endAngle: degrees } : item
+        ),
+      };
     },
   },
 });
@@ -45,8 +57,8 @@ export const {
   saveTargets,
   saveItem,
   sortSections,
-  changeIsResizing,
-  changeAngle,
+  changeStartAngle,
+  changeEndAngle,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

@@ -197,8 +197,6 @@ function RadarComponent({ config }) {
           d.data.selected ? '' : unSelectedSectionLabelShadow
         );
 
-      
-
       // Establecer manejadores de eventos de clic para las secciones y los puntos
       // sections.on('dblclick', () => {
       //   setTimeout(() => {
@@ -288,9 +286,6 @@ function RadarComponent({ config }) {
       svg.selectAll('*').remove();
     };
   }, [initialConfig]);
-
-
-  
 
   return (
     <>
