@@ -1,18 +1,18 @@
 export const data = {
   sections: [
     // {label, startAngle, endAngle, innerRadius, outerRadius, startElevation, endElevation, color, selected},
-    // {
-    //   label: '1',
-    //   startAngle: 12,
-    //   endAngle: 49,
-    //   innerRadius: 0.1,
-    //   outerRadius: 0.9,
-    //   startElevation: 4,
-    //   endElevation: 100,
-    //   color: 'red',
-    //   selected: false,
-    //   value: 10,
-    // },
+    {
+      label: '1',
+      startAngle: 12,
+      endAngle: 49,
+      innerRadius: 0.1,
+      outerRadius: 0.9,
+      startElevation: 4,
+      endElevation: 100,
+      color: 'red',
+      selected: false,
+      value: 10,
+    },
 
     {
       label: '2',
