@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+//import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   changeEndAngle,
@@ -8,7 +8,6 @@ import {
   saveTargets,
 } from '../../../../redux/slices/dataSlice';
 import {
-  useItemSelector,
   useSectionsSelector,
   useTargetsSelector,
 } from '../../../../redux/hooks/dataHooks';
@@ -65,13 +64,12 @@ export const useRadarComponent = ({
   const targetsRedux = useTargetsSelector();
   //const [sectionsData, setSectionsData] = useState(data.sections);
   //const [targetsData, settTargetsData] = useState(data.targets);
-  const [selectedAngle, setSelectedAngle] = useState(true);
-  const [positionClick, setPositionClick] = useState(0);
-  const [angleCustom, setAngleCustom] = useState(0);
+  // const [selectedAngle, setSelectedAngle] = useState(true);
+  // const [positionClick, setPositionClick] = useState(0);
   const width = radius * 2;
   const height = width;
-  const selectedAngleRef = useRef(selectedAngle);
-  const positionClickRef = useRef(positionClick);
+  // const selectedAngleRef = useRef(selectedAngle);
+  // const positionClickRef = useRef(positionClick);
 
   const updateSelectedState = (dataArray, label) =>
     dataArray.map((data) => ({ ...data, selected: data.label === label }));
@@ -80,7 +78,7 @@ export const useRadarComponent = ({
     event.stopPropagation();
     const newSectionsData = updateSelectedState(sectionsRedux, d.data.label);
     if (targetsRedux) {
-      const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
+      //const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
       //settTargetsData(newTargetsData);
     }
     let newSection = newSectionsData.find(
@@ -201,7 +199,7 @@ export const useRadarComponent = ({
   const handleTargetsClick = (event, d) => {
     const newTargetsData = updateSelectedState(targetsRedux, d.data.label);
     if (sectionsRedux) {
-      const newSectionsData = updateSelectedState(sectionsRedux, null); // Unselect all sections
+      //const newSectionsData = updateSelectedState(sectionsRedux, null); // Unselect all sections
       //setSectionsData(newSectionsData);
     }
     dispatch(
@@ -214,9 +212,9 @@ export const useRadarComponent = ({
     const rad = Math.atan2(event.y, event.x);
     console.log(`dragStart+${rad}`);
     const deg = rad * (180 / Math.PI) + 90;
-    setPositionClick(deg);
-    const currentSelectedAngle = selectedAngleRef.current;
-    const currentPositionClick = positionClickRef.current;
+    // setPositionClick(deg);
+    // const currentSelectedAngle = selectedAngleRef.current;
+    // const currentPositionClick = positionClickRef.current;
 
     console.log(
       rad,
@@ -224,14 +222,14 @@ export const useRadarComponent = ({
       d.data.startAngle * (Math.PI / 180)
     );
 
-    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    // const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
 
     if (d.data.endAngle - deg < deg - d.data.startAngle) {
-      setSelectedAngle(false);
+      //setSelectedAngle(false);
     }
 
     if (d.data.endAngle - deg > deg - d.data.startAngle) {
-      setSelectedAngle(true);
+      //setSelectedAngle(true);
     }
   };
 
@@ -311,8 +309,8 @@ export const useRadarComponent = ({
 
   const handleMouseMove = (event, d) => {
     if (isResizing) {
-      const [x, y] = d3.pointer(event);
-      const degrees = getDegreesByEvent(x, y);
+      //const [x, y] = d3.pointer(event);
+      //const degrees = getDegreesByEvent(x, y);
       // let newSectionsData = sectionsRedux.map((item) => {
       //   if (item.selected) {
       //     return { ...item, startAngle: degrees };
