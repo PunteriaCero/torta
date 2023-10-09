@@ -11,3 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+circle.end-circle,
+circle.start-circle {
+  fill: rgb(255, 255, 255);
+  cursor: nwse-resize;
+  position: fixed;
+  z-index: 100 !important;
+}

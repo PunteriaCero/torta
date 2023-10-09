@@ -11,6 +11,7 @@ example online: https://punteriacero.github.io/torta/
 - Selected sections and points show a shadow and highlight effect.
 - Section and point labels change color and style when selected.
 - When clicking an element or section, it is returned in the onclick function received by props.
+- Use **react redux** tool to configurate data information. `data` is an object of data containing the necessary information for the visualization.
 
 
 ## Used technology
@@ -26,8 +27,6 @@ example online: https://punteriacero.github.io/torta/
 
 ## Available Properties
 
-- `data`: An object of data containing the necessary information for the visualization.
-- `onClick`: A click event handler function called when a section or point is clicked.
 - `config`: style config.
 
 ## Available Data Properties
