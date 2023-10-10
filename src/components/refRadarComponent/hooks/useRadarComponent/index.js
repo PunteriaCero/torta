@@ -11,6 +11,11 @@ import {
   useTargetsSelector,
 } from '../../../../redux/hooks/dataHooks';
 import * as d3 from 'd3';
+import {
+  setPositionCircle,
+  getCoordinatesCircles,
+  generateReferencesDOM,
+} from '../../utils';
 
 export const useRadarComponent = ({
   config: {
@@ -79,19 +84,7 @@ export const useRadarComponent = ({
     dispatch(saveSections(newSectionsData));
     resetCircles(newSectionsData);
 
-    let referencesClass = {
-      classStart: `start-circle item-${section.data.label}`,
-      classEnd: `end-circle item-${section.data.label}`,
-      classSelectStart: `.start-circle.item-${section.data.label}`,
-      classSelectEnd: `.end-circle.item-${section.data.label}`,
-    };
-
-    referencesClass['existCircleStart'] = d3
-      .select(referencesClass.classSelectStart)
-      .node();
-    referencesClass['existCircleEnd'] = d3
-      .select(referencesClass.classSelectEnd)
-      .node();
+    let referencesClass = generateReferencesDOM(section.data);
 
     const drag = addEventDragCircles(section.data, newSection, referencesClass);
     addCirclesSVG(section.data, drag, referencesClass);
@@ -129,11 +122,9 @@ export const useRadarComponent = ({
         const degrees = getDegreesByEvent(event.x, event.y);
         if (d3.select(this).classed(reference.classStart)) {
           newSection = { ...newSection, startAngle: degrees };
-          setPositionCicles(newSection, reference);
         }
         if (d3.select(this).classed(reference.classEnd)) {
           newSection = { ...newSection, endAngle: degrees };
-          setPositionCicles(newSection, reference, false);
         }
       })
       .on('drag', function (event) {
@@ -142,29 +133,17 @@ export const useRadarComponent = ({
           const saveItemStart = { ...newSection, startAngle: degrees };
           dispatch(saveItem(saveItemStart));
           updateReduxAngles(degrees, section.label);
-          setPositionCicles(saveItemStart, reference);
+          setPositionCircle(saveItemStart, reference, true);
         }
         if (d3.select(this).classed(reference.classEnd)) {
           const saveItemEnd = { ...newSection, endAngle: degrees };
           dispatch(saveItem(saveItemEnd));
           updateReduxAngles(degrees, section.label, false);
-          setPositionCicles(saveItemEnd, reference, false);
+          setPositionCircle(saveItemEnd, reference, false);
         }
       });
 
     return drag;
-  };
-
-  const setPositionCicles = (newSection, reference, start = true) => {
-    if (start) {
-      const { cxStart, cyStart } = getCoordinatesCircles(newSection);
-      const circleStart = d3.select(reference.classSelectStart);
-      if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
-    } else {
-      const { cxEnd, cyEnd } = getCoordinatesCircles(newSection);
-      const circleEnd = d3.select(reference.classSelectEnd);
-      if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
-    }
   };
 
   const resetCircles = (data) => {
@@ -176,24 +155,6 @@ export const useRadarComponent = ({
         });
       }
     });
-  };
-
-  const getCoordinatesCircles = (data) => {
-    const outerRadius = data.outerRadius * 280; // Convert relative radius to actual pixels
-
-    // Calculate start point coordinates
-    const cxStart =
-      280 + outerRadius * Math.cos((data.startAngle * Math.PI - 280) / 180);
-    const cyStart =
-      280 + outerRadius * Math.sin((data.startAngle * Math.PI - 280) / 180);
-
-    // Calculate end point coordinates
-    const cxEnd =
-      280 + outerRadius * Math.cos((data.endAngle * Math.PI - 280) / 180);
-    const cyEnd =
-      280 + outerRadius * Math.sin((data.endAngle * Math.PI - 280) / 180);
-
-    return { cxStart, cyStart, cxEnd, cyEnd };
   };
 
   const getDegreesByEvent = (x, y) => {

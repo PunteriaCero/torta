@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import { useDataSelector, useItemSelector } from '../../redux/hooks/dataHooks';
+import {
+  useItemSelector,
+  useSectionsSelector,
+} from '../../redux/hooks/dataHooks';
 import { useDispatch } from 'react-redux';
 import { saveSections } from '../../redux/slices/dataSlice';
+import {
+  generateReferencesDOM,
+  setPositionCircle,
+} from '../refRadarComponent/utils';
 
 function valuetext(value) {
   return `${value}`;
@@ -11,7 +18,7 @@ function valuetext(value) {
 
 export default function MinimumDistanceSlider() {
   const selectedRow = useItemSelector();
-  const currentData = useDataSelector();
+  const sectionsRedux = useSectionsSelector();
   const dispatch = useDispatch();
 
   const [value1, setValue1] = useState([
@@ -44,7 +51,7 @@ export default function MinimumDistanceSlider() {
       setValue1(newValue);
     }
 
-    onChange(newValues);
+    onChange(newValues, activeThumb);
   };
 
   const handleChange2 = (event, newValue, activeThumb) => {
@@ -66,10 +73,10 @@ export default function MinimumDistanceSlider() {
     } else {
       setValue2(newValue);
     }
-    onChange(newValues);
+    onChange(newValues, activeThumb, true);
   };
 
-  const onChange = (newValues) => {
+  const onChange = (newValues, activeThumb, isChangeRadius = false) => {
     let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
 
     if (startAngle < 0) {
@@ -87,15 +94,27 @@ export default function MinimumDistanceSlider() {
       outerRadius: outerRadius,
     };
 
-    const objetoExistenteIndex = currentData.sections.findIndex(
+    const objetoExistenteIndex = sectionsRedux.findIndex(
       (obj) => obj.label === newSelectedRow.label
     );
 
     if (objetoExistenteIndex !== -1) {
-      const dataSectionsCopy = [...currentData.sections];
+      const dataSectionsCopy = [...sectionsRedux];
       dataSectionsCopy.map((section) => section.selected === false);
       dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
       dispatch(saveSections(dataSectionsCopy));
+
+      const reference = generateReferencesDOM(newSelectedRow);
+      if (isChangeRadius) {
+        setPositionCircle(newSelectedRow, reference, true);
+        setPositionCircle(newSelectedRow, reference, false);
+      } else {
+        setPositionCircle(
+          newSelectedRow,
+          reference,
+          activeThumb ? false : true
+        );
+      }
     }
   };
 

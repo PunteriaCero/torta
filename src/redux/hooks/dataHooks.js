@@ -16,7 +16,4 @@ export const useTargetsSelector = () =>
   useAppSelector((state) => {
     return state.data.targets;
   });
-export const useResizeSelector = () =>
-  useAppSelector((state) => {
-    return state.data.isResizing;
-  });
+ 
