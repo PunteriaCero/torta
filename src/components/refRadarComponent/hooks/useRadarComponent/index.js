@@ -1,4 +1,3 @@
-//import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   changeEndAngle,
@@ -58,29 +57,21 @@ export const useRadarComponent = ({
   },
   svgRef,
 }) => {
-  let isResizing = false;
   const dispatch = useDispatch();
   const sectionsRedux = useSectionsSelector();
   const targetsRedux = useTargetsSelector();
-  //const [sectionsData, setSectionsData] = useState(data.sections);
-  //const [targetsData, settTargetsData] = useState(data.targets);
-  // const [selectedAngle, setSelectedAngle] = useState(true);
-  // const [positionClick, setPositionClick] = useState(0);
   const width = radius * 2;
   const height = width;
-  // const selectedAngleRef = useRef(selectedAngle);
-  // const positionClickRef = useRef(positionClick);
 
   const updateSelectedState = (dataArray, label) =>
     dataArray.map((data) => ({ ...data, selected: data.label === label }));
 
-  const handleSectionClick = (event, d) => {
+  const handleSectionClick = (event, section) => {
     event.stopPropagation();
-    const newSectionsData = updateSelectedState(sectionsRedux, d.data.label);
-    if (targetsRedux) {
-      //const newTargetsData = updateSelectedState(targetsRedux, null); // Unselect all targets
-      //settTargetsData(newTargetsData);
-    }
+    const newSectionsData = updateSelectedState(
+      sectionsRedux,
+      section.data.label
+    );
     let newSection = newSectionsData.find(
       (section) => section.selected === true
     );
@@ -88,64 +79,91 @@ export const useRadarComponent = ({
     dispatch(saveSections(newSectionsData));
     resetCircles(newSectionsData);
 
-    const drag = d3
-      .drag()
-      .on('start', function (event) {
-        d3.select(this).raise(); // Bring the dragged element to the front
-      })
-      .on('end', function (event) {
-        const degrees = getDegreesByEvent(event.x, event.y);
-        if (d3.select(this).classed(classStart)) {
-          newSection = { ...newSection, startAngle: degrees };
-          const { cxStart, cyStart } = getCoordinatesCircles(newSection);
-          const circleStart = d3.select(classSelectStart);
-          if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
-          dispatch(saveItem({ ...newSection, startAngle: degrees }));
-        }
-        if (d3.select(this).classed(classEnd)) {
-          newSection = { ...newSection, endAngle: degrees };
-          const { cxEnd, cyEnd } = getCoordinatesCircles(newSection);
-          const circleEnd = d3.select(classSelectEnd);
-          if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
-          dispatch(saveItem({ ...newSection, endAngle: degrees }));
-        }
-      })
-      .on('drag', function (event) {
-        const degrees = getDegreesByEvent(event.x, event.y);
-        if (d3.select(this).classed(classStart)) {
-          updateReduxAngles(degrees, d.data.label);
-        }
-        if (d3.select(this).classed(classEnd)) {
-          updateReduxAngles(degrees, d.data.label, false);
-        }
-      });
+    let referencesClass = {
+      classStart: `start-circle item-${section.data.label}`,
+      classEnd: `end-circle item-${section.data.label}`,
+      classSelectStart: `.start-circle.item-${section.data.label}`,
+      classSelectEnd: `.end-circle.item-${section.data.label}`,
+    };
 
+    referencesClass['existCircleStart'] = d3
+      .select(referencesClass.classSelectStart)
+      .node();
+    referencesClass['existCircleEnd'] = d3
+      .select(referencesClass.classSelectEnd)
+      .node();
+
+    const drag = addEventDragCircles(section.data, newSection, referencesClass);
+    addCirclesSVG(section.data, drag, referencesClass);
+  };
+
+  const addCirclesSVG = (section, drag, reference) => {
     const svg = d3.select('svg');
-    const classStart = `start-circle item-${d.data.label}`;
-    const classEnd = `end-circle item-${d.data.label}`;
-    const classSelectStart = `.start-circle.item-${d.data.label}`;
-    const classSelectEnd = `.end-circle.item-${d.data.label}`;
-    const existCircleStart = d3.select(classSelectStart).node();
-    const existCircleEnd = d3.select(classSelectEnd).node();
-
-    const { cxStart, cyStart, cxEnd, cyEnd } = getCoordinatesCircles(d.data);
-
-    if (!existCircleStart) {
+    const { cxStart, cyStart, cxEnd, cyEnd } = getCoordinatesCircles(section);
+    if (!reference.existCircleStart) {
       const startCircle = svg
         .append('circle')
-        .attr('class', classStart)
+        .attr('class', reference.classStart)
         .attr('r', 8);
       startCircle.attr('cx', cxStart).attr('cy', cyStart);
       startCircle.call(drag);
     }
 
-    if (!existCircleEnd) {
+    if (!reference.existCircleEnd) {
       const endCircle = svg
         .append('circle')
-        .attr('class', classEnd)
+        .attr('class', reference.classEnd)
         .attr('r', 8);
       endCircle.attr('cx', cxEnd).attr('cy', cyEnd);
       endCircle.call(drag);
+    }
+  };
+
+  const addEventDragCircles = (section, newSection, reference) => {
+    const drag = d3
+      .drag()
+      .on('start', function () {
+        d3.select(this).raise();
+      })
+      .on('end', function (event) {
+        const degrees = getDegreesByEvent(event.x, event.y);
+        if (d3.select(this).classed(reference.classStart)) {
+          newSection = { ...newSection, startAngle: degrees };
+          setPositionCicles(newSection, reference);
+        }
+        if (d3.select(this).classed(reference.classEnd)) {
+          newSection = { ...newSection, endAngle: degrees };
+          setPositionCicles(newSection, reference, false);
+        }
+      })
+      .on('drag', function (event) {
+        const degrees = getDegreesByEvent(event.x, event.y);
+        if (d3.select(this).classed(reference.classStart)) {
+          const saveItemStart = { ...newSection, startAngle: degrees };
+          dispatch(saveItem(saveItemStart));
+          updateReduxAngles(degrees, section.label);
+          setPositionCicles(saveItemStart, reference);
+        }
+        if (d3.select(this).classed(reference.classEnd)) {
+          const saveItemEnd = { ...newSection, endAngle: degrees };
+          dispatch(saveItem(saveItemEnd));
+          updateReduxAngles(degrees, section.label, false);
+          setPositionCicles(saveItemEnd, reference, false);
+        }
+      });
+
+    return drag;
+  };
+
+  const setPositionCicles = (newSection, reference, start = true) => {
+    if (start) {
+      const { cxStart, cyStart } = getCoordinatesCircles(newSection);
+      const circleStart = d3.select(reference.classSelectStart);
+      if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
+    } else {
+      const { cxEnd, cyEnd } = getCoordinatesCircles(newSection);
+      const circleEnd = d3.select(reference.classSelectEnd);
+      if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
     }
   };
 
@@ -185,6 +203,9 @@ export const useRadarComponent = ({
     if (degrees < 0) {
       degrees += 360;
     }
+
+    degrees = Math.round(degrees);
+
     return degrees;
   };
 
@@ -198,143 +219,33 @@ export const useRadarComponent = ({
 
   const handleTargetsClick = (event, d) => {
     const newTargetsData = updateSelectedState(targetsRedux, d.data.label);
-    if (sectionsRedux) {
-      //const newSectionsData = updateSelectedState(sectionsRedux, null); // Unselect all sections
-      //setSectionsData(newSectionsData);
-    }
     dispatch(
       saveItem(newTargetsData.find((target) => target.selected === true))
     );
-    // settTargetsData(newTargetsData);
-  };
-
-  const handleSectionDragStart = (event, d) => {
-    const rad = Math.atan2(event.y, event.x);
-    console.log(`dragStart+${rad}`);
-    const deg = rad * (180 / Math.PI) + 90;
-    // setPositionClick(deg);
-    // const currentSelectedAngle = selectedAngleRef.current;
-    // const currentPositionClick = positionClickRef.current;
-
-    console.log(
-      rad,
-      d.data.endElevation * (Math.PI / 180),
-      d.data.startAngle * (Math.PI / 180)
-    );
-
-    // const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
-
-    if (d.data.endAngle - deg < deg - d.data.startAngle) {
-      //setSelectedAngle(false);
-    }
-
-    if (d.data.endAngle - deg > deg - d.data.startAngle) {
-      //setSelectedAngle(true);
-    }
-  };
-
-  const handleSectionDrag = (event, d) => {};
-
-  const handleSectionDragEnd = (event, d) => {
-    console.log('dragEnd', event, d);
-    // Calcular el ángulo en radianes
-    // const x = event.x - width / 2;
-    // const y = height / 2 - event.y;
-    // console.log(selectedAngleRef.current);
-    // // Calcula el ángulo actual basado en las coordenadas del mouse
-    // // const currentAngle = (Math.atan2(y, x) * 180) / Math.PI;
-    // // const angleDifference = currentAngle - d.startAngle;
-    // const rad = Math.atan2(event.y, event.x);
-    // const deg = rad * (180 / Math.PI) + 90;
-    // const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
-    // const hpMax = svgRef.current.getBoundingClientRect().width / 2;
-    // const radie = hp / hpMax;
-    // const obj = {
-    //   rad: rad,
-    //   deg: deg,
-    //   x: event.x,
-    //   y: event.y,
-    //   radie: radie,
-    // };
-    // // console.log("obj input", obj);
-    // // Calcula el ángulo de inicio ajustado
-    // const newSections = sectionsRedux.map((section, index) => {
-    //   //agregar index a data
-    //   return {
-    //     ...section,
-    //     startAngle:
-    //       index === d.index && selectedAngle ? obj.deg : section.startAngle,
-    //     endAngle:
-    //       index === d.index && !selectedAngle ? obj.deg : section.endAngle,
-    //   };
-    // });
-
-    // const newSections = sectionsRedux.map((section, index) => {
-    //   return {
-    //     ...section,
-    //     startAngle:
-    //       index === d.index && selectedAngle ? obj.deg : section.startAngle,
-    //     endAngle:
-    //       index === d.index && !selectedAngle ? obj.deg : section.endAngle,
-    //   };
-    // });
-
-    // dispatch(saveSections(newSections));
   };
 
   const handleTargetDragEnd = (event, d) => {
     const rad = Math.atan2(event.y, event.x);
-    const deg = rad * (180 / Math.PI) + 90;
+    let degrees = rad * (180 / Math.PI) + 90;
     const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
     const hpMax = svgRef.current.getBoundingClientRect().width / 2;
     const radius = hp / hpMax;
 
+    degrees = Math.round(degrees);
+
     const newTargets = targetsRedux.map((target, index) => {
       return {
         ...target,
-        angle: index === d.index ? deg : target.angle,
+        angle: index === d.index ? degrees : target.angle,
         radius: index === d.index ? radius : target.radius,
       };
     });
     dispatch(saveTargets(newTargets));
   };
 
-  const handleMouseDown = (event, d) => {
-    isResizing = true;
-  };
-
-  const handleMouseUp = (event, d) => {
-    isResizing = false;
-  };
-
-  const handleMouseMove = (event, d) => {
-    if (isResizing) {
-      //const [x, y] = d3.pointer(event);
-      //const degrees = getDegreesByEvent(x, y);
-      // let newSectionsData = sectionsRedux.map((item) => {
-      //   if (item.selected) {
-      //     return { ...item, startAngle: degrees };
-      //   } else {
-      //     return item;
-      //   }
-      // });
-      // dispatch(saveSections(newSectionsData));
-
-      // selectedSlice = { ...selectedSlice, startAngle: degrees };
-
-      // dispatch(saveItem(selectedSlice));
-    }
-  };
-
   return {
     handleSectionClick,
     handleTargetsClick,
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseMove,
-    handleSectionDragEnd,
-    handleSectionDragStart,
-    handleSectionDrag,
     handleTargetDragEnd,
     width,
     height,
