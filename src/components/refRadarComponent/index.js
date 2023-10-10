@@ -27,12 +27,12 @@ function RadarComponent({ config }) {
     const {
       handleSectionClick,
       handleTargetsClick,
-      handleMouseDown,
-      handleMouseUp,
-      handleMouseMove,
-      handleSectionDragEnd,
-      handleSectionDragStart,
-      handleSectionDrag,
+      // handleMouseDown,
+      // handleMouseUp,
+      // handleMouseMove,
+      // handleSectionDragEnd,
+      // handleSectionDragStart,
+      // handleSectionDrag,
       handleTargetDragEnd,
       width,
       height,
@@ -131,7 +131,7 @@ function RadarComponent({ config }) {
       const svgElement = svgRef.current;
 
       // Obtén las coordenadas del extremo superior izquierdo del SVG
-      const svgBounds = svgElement.getBoundingClientRect();
+      //const svgBounds = svgElement.getBoundingClientRect();
 
       // Agregar elementos de tipo "path" para las secciones
       sections
@@ -285,6 +285,7 @@ function RadarComponent({ config }) {
     return () => {
       svg.selectAll('*').remove();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialConfig]);
 
   return (
