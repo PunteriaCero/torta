@@ -128,7 +128,7 @@ function RadarComponent({ config }) {
         )
         .endAngle((d) => d.data.endAngle * (Math.PI / 180));
 
-      const svgElement = svgRef.current;
+      //const svgElement = svgRef.current;
 
       // Obtén las coordenadas del extremo superior izquierdo del SVG
       //const svgBounds = svgElement.getBoundingClientRect();
