@@ -6,7 +6,6 @@ const initialState = {
   sections: data.sections,
   targets: [],
   item: null,
-  isResizing: false,
   newAngle: 0,
 };
 

@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 function generateBaseCircles(numCircles, color) {
   const baseCircles = [];
 
@@ -59,3 +60,51 @@ export function BaseLines({
 export function compareByEndElevation(a, b) {
   return a.endElevation - b.endElevation;
 }
+
+export const setPositionCircle = (newSection, reference, start) => {
+  if (start) {
+    const { cxStart, cyStart } = getCoordinatesCircles(newSection);
+    const circleStart = d3.select(reference.classSelectStart);
+    if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
+  } else {
+    const { cxEnd, cyEnd } = getCoordinatesCircles(newSection);
+    const circleEnd = d3.select(reference.classSelectEnd);
+    if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
+  }
+};
+
+export const getCoordinatesCircles = (data) => {
+  const outerRadius = data.outerRadius * 280; // Convert relative radius to actual pixels
+
+  // Calculate start point coordinates
+  const cxStart =
+    280 + outerRadius * Math.cos((data.startAngle * Math.PI - 280) / 180);
+  const cyStart =
+    280 + outerRadius * Math.sin((data.startAngle * Math.PI - 280) / 180);
+
+  // Calculate end point coordinates
+  const cxEnd =
+    280 + outerRadius * Math.cos((data.endAngle * Math.PI - 280) / 180);
+  const cyEnd =
+    280 + outerRadius * Math.sin((data.endAngle * Math.PI - 280) / 180);
+
+  return { cxStart, cyStart, cxEnd, cyEnd };
+};
+
+export const generateReferencesDOM = (section) => {
+  let referencesClass = {
+    classStart: `start-circle item-${section.label}`,
+    classEnd: `end-circle item-${section.label}`,
+    classSelectStart: `.start-circle.item-${section.label}`,
+    classSelectEnd: `.end-circle.item-${section.label}`,
+  };
+
+  referencesClass['existCircleStart'] = d3
+    .select(referencesClass.classSelectStart)
+    .node();
+  referencesClass['existCircleEnd'] = d3
+    .select(referencesClass.classSelectEnd)
+    .node();
+
+  return referencesClass;
+};

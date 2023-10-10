@@ -1,1 +1,1 @@
-export  { default as useRadarComponent } from "./useRadarComponent";
+export { default as useRadarComponent } from './useRadarComponent';
