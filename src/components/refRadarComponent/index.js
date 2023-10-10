@@ -26,13 +26,7 @@ function RadarComponent({ config }) {
   useEffect(() => {
     const {
       handleSectionClick,
-      handleTargetsClick,
-      // handleMouseDown,
-      // handleMouseUp,
-      // handleMouseMove,
-      // handleSectionDragEnd,
-      // handleSectionDragStart,
-      // handleSectionDrag,
+      handleTargetsClick, 
       handleTargetDragEnd,
       width,
       height,
@@ -86,8 +80,7 @@ function RadarComponent({ config }) {
     BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
-    const lineAngles = d3.range(numLines).map((i) => {
-      // console.log("i", i);
+    const lineAngles = d3.range(numLines).map((i) => { 
       return ((i * 360) / numLines) * (Math.PI / 180);
     });
 
@@ -127,11 +120,6 @@ function RadarComponent({ config }) {
             : d.data.startAngle * (Math.PI / 180)
         )
         .endAngle((d) => d.data.endAngle * (Math.PI / 180));
-
-      //const svgElement = svgRef.current;
-
-      // Obtén las coordenadas del extremo superior izquierdo del SVG
-      //const svgBounds = svgElement.getBoundingClientRect();
 
       // Agregar elementos de tipo "path" para las secciones
       sections
@@ -196,17 +184,6 @@ function RadarComponent({ config }) {
         .style('filter', (d) =>
           d.data.selected ? '' : unSelectedSectionLabelShadow
         );
-
-      // Establecer manejadores de eventos de clic para las secciones y los puntos
-      // sections.on('dblclick', () => {
-      //   setTimeout(() => {
-      //     console.log('dblclick');
-      //     const svg2 = d3.select(svgElement);
-      //     svg2.on('mousedown', handleMouseDown);
-      //     svg2.on('mouseup', handleMouseUp);
-      //     svg2.on('mousemove', handleMouseMove);
-      //   }, 400);
-      // });
     }
 
     // Si existen targets se renderizan en el radar
