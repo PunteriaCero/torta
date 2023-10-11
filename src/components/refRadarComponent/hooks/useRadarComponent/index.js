@@ -202,6 +202,10 @@ export const useRadarComponent = ({
       };
     });
     dispatch(saveTargets(newTargets));
+    const newTargetsData = updateSelectedState(targetsRedux, d.data.label);
+    dispatch(
+      saveItem(newTargetsData.find((target) => target.selected === true))
+    );
   };
 
   return {

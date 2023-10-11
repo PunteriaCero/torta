@@ -109,7 +109,7 @@ export default function CustomizedTables() {
                       {row.angle}
                     </StyledTableCell>
                     <StyledTableCell style={{ color: 'white' }} align="center">
-                      {row.radius * 100}
+                      {Math.round(row.radius * 100)}
                     </StyledTableCell>
                   </StyledTableRow>
                 ))
