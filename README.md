@@ -16,8 +16,8 @@ example online: https://punteriacero.github.io/torta/
 
 ## Used technology
 
--React
--D3.js
+- React
+- D3.js
 
 ## functional limitations 
 
