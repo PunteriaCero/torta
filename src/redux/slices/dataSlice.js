@@ -30,20 +30,20 @@ const dataSlice = createSlice({
       return { ...state, sections: sortedSections };
     },
     changeStartAngle: (state, { payload }) => {
-      const { label, degrees } = payload;
+      const { index, degrees } = payload;
       return {
         ...state,
-        sections: state.sections.map((item) =>
-          item.label === label ? { ...item, startAngle: degrees } : item
+        sections: state.sections.map((item, idx) =>
+          idx === index ? { ...item, startAngle: degrees } : item
         ),
       };
     },
     changeEndAngle: (state, { payload }) => {
-      const { label, degrees } = payload;
+      const { index, degrees } = payload;
       return {
         ...state,
-        sections: state.sections.map((item) =>
-          item.label === label ? { ...item, endAngle: degrees } : item
+        sections: state.sections.map((item, idx) =>
+          idx === index ? { ...item, endAngle: degrees } : item
         ),
       };
     },

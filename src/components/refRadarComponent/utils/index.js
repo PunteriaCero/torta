@@ -44,7 +44,6 @@ export function BaseLines({
   lineAngles.forEach((angle) => {
     const x2 = Math.cos(angle) * radius;
     const y2 = Math.sin(angle) * (-radius + 1.5);
-    // console.log("x,y", angle, x2, y2);
     svg
       .append('line')
       .attr('x1', 0)
@@ -62,14 +61,18 @@ export function compareByEndElevation(a, b) {
 }
 
 export const setPositionCircle = (newSection, reference, start) => {
+  const circleStart = d3.select(reference.classSelectStart);
+  const circleEnd = d3.select(reference.classSelectEnd);
   if (start) {
     const { cxStart, cyStart } = getCoordinatesCircles(newSection);
-    const circleStart = d3.select(reference.classSelectStart);
-    if (circleStart) circleStart.attr('cx', cxStart).attr('cy', cyStart);
+    if (circleStart) {
+      circleStart.attr('cx', cxStart).attr('cy', cyStart);
+    }
   } else {
     const { cxEnd, cyEnd } = getCoordinatesCircles(newSection);
-    const circleEnd = d3.select(reference.classSelectEnd);
-    if (circleEnd) circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
+    if (circleEnd) {
+      circleEnd.attr('cx', cxEnd).attr('cy', cyEnd);
+    }
   }
 };
 

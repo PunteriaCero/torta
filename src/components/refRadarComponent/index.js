@@ -26,7 +26,7 @@ function RadarComponent({ config }) {
   useEffect(() => {
     const {
       handleSectionClick,
-      handleTargetsClick, 
+      handleTargetsClick,
       handleTargetDragEnd,
       width,
       height,
@@ -69,18 +69,25 @@ function RadarComponent({ config }) {
     } = initialConfig;
 
     // Seleccionar el elemento SVG a través de la referencia y establecer sus atributos de ancho y alto
-    const svg = d3
-      .select(svgRef.current)
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', `translate(${width / 2}, ${height / 2})`);
+    // Check if a <g> element with class "radar-component" already exists
+    let svg = d3.select('g.radar-component');
+
+    if (svg.empty()) {
+      // If it doesn't exist, create a new one
+      svg = d3
+        .select(svgRef.current)
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('class', 'radar-component')
+        .attr('transform', `translate(${width / 2}, ${height / 2})`);
+    }
 
     // Generar circulos
     BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
 
     // Definir ángulos para las líneas desde el centro hasta el radio máximo
-    const lineAngles = d3.range(numLines).map((i) => { 
+    const lineAngles = d3.range(numLines).map((i) => {
       return ((i * 360) / numLines) * (Math.PI / 180);
     });
 
@@ -262,7 +269,7 @@ function RadarComponent({ config }) {
     return () => {
       svg.selectAll('*').remove();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialConfig]);
 
   return (
