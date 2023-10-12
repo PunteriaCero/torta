@@ -68,15 +68,12 @@ export const useRadarComponent = ({
   const width = radius * 2;
   const height = width;
 
-  const updateSelectedState = (dataArray, label) =>
-    dataArray.map((data) => ({ ...data, selected: data.label === label }));
+  const updateSelectedState = (dataArray, index) =>
+    dataArray.map((data, idx) => ({ ...data, selected: idx === index }));
 
   const handleSectionClick = (event, section) => {
     event.stopPropagation();
-    const newSectionsData = updateSelectedState(
-      sectionsRedux,
-      section.data.label
-    );
+    const newSectionsData = updateSelectedState(sectionsRedux, section.index);
     let newSection = newSectionsData.find(
       (section) => section.selected === true
     );
@@ -86,24 +83,24 @@ export const useRadarComponent = ({
 
     let referencesClass = generateReferencesDOM(section.data);
 
-    const drag = addEventDragCircles(section.data, newSection, referencesClass);
+    const drag = addEventDragCircles(section, newSection, referencesClass);
     addCirclesSVG(section.data, drag, referencesClass);
   };
 
   const addCirclesSVG = (section, drag, reference) => {
     const svg = d3.select('svg');
     const { cxStart, cyStart, cxEnd, cyEnd } = getCoordinatesCircles(section);
+
     if (!reference.existCircleStart) {
-      const startCircle = svg
+      let startCircle = svg
         .append('circle')
         .attr('class', reference.classStart)
         .attr('r', 8);
       startCircle.attr('cx', cxStart).attr('cy', cyStart);
       startCircle.call(drag);
     }
-
     if (!reference.existCircleEnd) {
-      const endCircle = svg
+      let endCircle = svg
         .append('circle')
         .attr('class', reference.classEnd)
         .attr('r', 8);
@@ -122,9 +119,11 @@ export const useRadarComponent = ({
         const degrees = getDegreesByEvent(event.x, event.y);
         if (d3.select(this).classed(reference.classStart)) {
           newSection = { ...newSection, startAngle: degrees };
+          setPositionCircle(newSection, reference, true);
         }
         if (d3.select(this).classed(reference.classEnd)) {
           newSection = { ...newSection, endAngle: degrees };
+          setPositionCircle(newSection, reference, false);
         }
       })
       .on('drag', function (event) {
@@ -132,13 +131,13 @@ export const useRadarComponent = ({
         if (d3.select(this).classed(reference.classStart)) {
           const saveItemStart = { ...newSection, startAngle: degrees };
           dispatch(saveItem(saveItemStart));
-          updateReduxAngles(degrees, section.label);
+          updateReduxAngles(degrees, section.index);
           setPositionCircle(saveItemStart, reference, true);
         }
         if (d3.select(this).classed(reference.classEnd)) {
           const saveItemEnd = { ...newSection, endAngle: degrees };
           dispatch(saveItem(saveItemEnd));
-          updateReduxAngles(degrees, section.label, false);
+          updateReduxAngles(degrees, section.index, false);
           setPositionCircle(saveItemEnd, reference, false);
         }
       });
@@ -170,11 +169,11 @@ export const useRadarComponent = ({
     return degrees;
   };
 
-  const updateReduxAngles = (degrees, label, start = true) => {
+  const updateReduxAngles = (degrees, index, start = true) => {
     if (start) {
-      dispatch(changeStartAngle({ label, degrees }));
+      dispatch(changeStartAngle({ index, degrees }));
     } else {
-      dispatch(changeEndAngle({ label, degrees }));
+      dispatch(changeEndAngle({ index, degrees }));
     }
   };
 

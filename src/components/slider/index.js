@@ -103,17 +103,12 @@ export default function MinimumDistanceSlider() {
       dataSectionsCopy.map((section) => section.selected === false);
       dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
       dispatch(saveSections(dataSectionsCopy));
-
       const reference = generateReferencesDOM(newSelectedRow);
       if (isChangeRadius) {
         setPositionCircle(newSelectedRow, reference, true);
         setPositionCircle(newSelectedRow, reference, false);
       } else {
-        setPositionCircle(
-          newSelectedRow,
-          reference,
-          activeThumb ? false : true
-        );
+        setPositionCircle(newSelectedRow, reference, !activeThumb);
       }
     }
   };
