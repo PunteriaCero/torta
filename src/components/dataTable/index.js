@@ -7,7 +7,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { useDataSelector, useItemSelector } from '../../redux/hooks/dataHooks';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -29,9 +28,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function CustomizedTables() {
-  const dataHook = useDataSelector();
-  const selectedRow = useItemSelector();
+export default function CustomizedTables({
+  showSections,
+  sections,
+  targets,
+  selectedRow,
+}) {
   return (
     <TableContainer component={Paper}>
       <Table
@@ -41,8 +43,7 @@ export default function CustomizedTables() {
       >
         <TableHead>
           {
-            //Sections
-            dataHook?.sections?.length ? (
+            showSections ? (
               <TableRow>
                 <StyledTableCell align="center">Label</StyledTableCell>
                 <StyledTableCell align="center">Start Angle</StyledTableCell>
@@ -51,69 +52,64 @@ export default function CustomizedTables() {
                 <StyledTableCell align="center">Outer Radius</StyledTableCell>
               </TableRow>
             ) : (
-              //Targets
               <TableRow>
                 <StyledTableCell align="center">Label</StyledTableCell>
                 <StyledTableCell align="center">Angle</StyledTableCell>
                 <StyledTableCell align="center">Radius</StyledTableCell>
               </TableRow>
-            )
+            ) // Targets
           }
         </TableHead>
         <TableBody>
-          {
-            //Sections
-            dataHook?.sections?.length
-              ? dataHook.sections.map((row) => (
-                  <StyledTableRow
-                    key={row.label}
-                    style={{
-                      backgroundColor:
-                        selectedRow?.label === row.label
-                          ? 'rgb(0, 189, 88)'
-                          : 'rgb(82, 82, 82)',
-                    }}
-                  >
-                    <StyledTableCell style={{ color: 'white' }} align="center">
-                      {row.label}
-                    </StyledTableCell>
-                    <StyledTableCell style={{ color: 'white' }} align="center">
-                      {row.startAngle}
-                    </StyledTableCell>
-                    <StyledTableCell style={{ color: 'white' }} align="center">
-                      {row.endAngle}
-                    </StyledTableCell>
-                    <StyledTableCell style={{ color: 'white' }} align="center">
-                      {Math.trunc(row.innerRadius * 100)}
-                    </StyledTableCell>
-                    <StyledTableCell align="center" style={{ color: 'white' }}>
-                      {Math.trunc(row.outerRadius * 100)}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))
-              : //Targets
-                dataHook.targets.map((row) => (
-                  <StyledTableRow
-                    key={row.label}
-                    style={{
-                      backgroundColor:
-                        selectedRow?.label === row.label
-                          ? 'rgb(0, 189, 88)'
-                          : 'rgb(82, 82, 82)',
-                    }}
-                  >
-                    <StyledTableCell style={{ color: 'white' }} align="center">
-                      {row.label}
-                    </StyledTableCell>
-                    <StyledTableCell style={{ color: 'white' }} align="center">
-                      {row.angle}
-                    </StyledTableCell>
-                    <StyledTableCell style={{ color: 'white' }} align="center">
-                      {Math.round(row.radius * 100)}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))
-          }
+          {showSections
+            ? sections.map((row) => (
+                <StyledTableRow
+                  key={row.label}
+                  style={{
+                    backgroundColor:
+                      selectedRow?.label === row.label
+                        ? 'rgb(0, 189, 88)'
+                        : 'rgb(82, 82, 82)',
+                  }}
+                >
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.label}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.startAngle}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.endAngle}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {Math.trunc(row.innerRadius * 100)}
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ color: 'white' }}>
+                    {Math.trunc(row.outerRadius * 100)}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            : targets.map((row) => (
+                <StyledTableRow
+                  key={row.label}
+                  style={{
+                    backgroundColor:
+                      selectedRow?.label === row.label
+                        ? 'rgb(0, 189, 88)'
+                        : 'rgb(82, 82, 82)',
+                  }}
+                >
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.label}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.angle}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {Math.round(row.radius * 100)}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
         </TableBody>
       </Table>
     </TableContainer>

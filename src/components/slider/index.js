@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
-import {
-  useItemSelector,
-  useSectionsSelector,
-} from '../../redux/hooks/dataHooks';
-import { useDispatch } from 'react-redux';
-import { saveSections } from '../../redux/slices/dataSlice';
-import {
-  generateReferencesDOM,
-  setPositionCircle,
-} from '../refRadarComponent/utils';
+import React, { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import Slider from "@mui/material/Slider";
 
 function valuetext(value) {
   return `${value}`;
 }
 
-export default function MinimumDistanceSlider() {
-  const selectedRow = useItemSelector();
-  const sectionsRedux = useSectionsSelector();
-  const dispatch = useDispatch();
-
+export default function MinimumDistanceSlider({
+  selectedRow,
+  onChange,
+}) {  
   const [value1, setValue1] = useState([
     selectedRow.startAngle,
     selectedRow.endAngle,
@@ -30,14 +19,17 @@ export default function MinimumDistanceSlider() {
     Math.trunc(selectedRow.outerRadius * 100),
   ]);
 
-  const handleChange1 = (event, newValue, activeThumb) => {
-    const newValues = [
-      newValue[0],
-      newValue[1],
-      value2[0] / 100,
-      value2[1] / 100,
-    ];
+  useEffect(() => {
+    setValue1([selectedRow.startAngle, selectedRow.endAngle]);
+    setValue2([
+      Math.trunc(selectedRow.innerRadius * 100),
+      Math.trunc(selectedRow.outerRadius * 100),
+    ]);
+  }, [selectedRow]);
 
+  const handleChange1 = (event, newValue, activeThumb) => {
+    const newValues = [newValue[0], newValue[1], value2[0] / 100, value2[1] / 100];
+  
     // Mantener una distancia de 5 unidades en el rango -360 a 360
     if (newValue[1] - newValue[0] < 5) {
       if (activeThumb === 0) {
@@ -50,17 +42,12 @@ export default function MinimumDistanceSlider() {
     } else {
       setValue1(newValue);
     }
-
+  
     onChange(newValues, activeThumb);
   };
 
-  const handleChange2 = (event, newValue, activeThumb) => {
-    const newValues = [
-      value1[0],
-      value1[1],
-      newValue[0] / 100,
-      newValue[1] / 100,
-    ];
+  const handleChange2 = (event, newValue, activeThumb) => {       
+    const newValues = [value1[0], value1[1], newValue[0] / 100, newValue[1] / 100]
 
     if (newValue[1] - newValue[0] < 5) {
       if (activeThumb === 0) {
@@ -76,56 +63,13 @@ export default function MinimumDistanceSlider() {
     onChange(newValues, activeThumb, true);
   };
 
-  const onChange = (newValues, activeThumb, isChangeRadius = false) => {
-    let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
-
-    if (startAngle < 0) {
-      startAngle += 360;
-    }
-    if (endAngle < 0) {
-      endAngle += 360;
-    }
-
-    const newSelectedRow = {
-      ...selectedRow,
-      startAngle: startAngle,
-      endAngle: endAngle,
-      innerRadius: innerRadius,
-      outerRadius: outerRadius,
-    };
-
-    const objetoExistenteIndex = sectionsRedux.findIndex(
-      (obj) => obj.label === newSelectedRow.label
-    );
-
-    if (objetoExistenteIndex !== -1) {
-      const dataSectionsCopy = [...sectionsRedux];
-      dataSectionsCopy.map((section) => section.selected === false);
-      dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
-      dispatch(saveSections(dataSectionsCopy));
-      const reference = generateReferencesDOM(newSelectedRow);
-      if (isChangeRadius) {
-        setPositionCircle(newSelectedRow, reference, true);
-        setPositionCircle(newSelectedRow, reference, false);
-      } else {
-        setPositionCircle(newSelectedRow, reference, !activeThumb);
-      }
-    }
-  };
-
-  useEffect(() => {
-    setValue1([selectedRow.startAngle, selectedRow.endAngle]);
-    setValue2([
-      Math.trunc(selectedRow.innerRadius * 100),
-      Math.trunc(selectedRow.outerRadius * 100),
-    ]);
-  }, [selectedRow]);
-
   return (
     <Box sx={{ width: 600 }}>
-      <div style={{ color: 'whitesmoke' }}>Angle</div>
+     <div style={{color:"whitesmoke"}}>
+        Angle
+      </div>
       <Slider
-        getAriaLabel={() => 'Minimum distance'}
+        getAriaLabel={() => "Minimum distance"}
         value={value1}
         onChange={handleChange1}
         min={-360}
@@ -137,9 +81,11 @@ export default function MinimumDistanceSlider() {
       />
       <br />
       <br />
-      <div style={{ color: 'whitesmoke' }}>Radius</div>
+      <div style={{color:"whitesmoke"}}>
+        Radius
+      </div>
       <Slider
-        getAriaLabel={() => 'Minimum distance shift'}
+        getAriaLabel={() => "Minimum distance shift"}
         value={value2}
         onChange={handleChange2}
         min={0}

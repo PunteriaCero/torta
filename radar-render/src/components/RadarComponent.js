@@ -1,17 +1,30 @@
 import React, { useRef, useEffect } from 'react';
-import { BaseCircles, BaseLines } from './utils';
-import useRadarComponent from './hooks/useRadarComponent';
-import {
-  useSectionsSelector,
-  useTargetsSelector,
-} from '../../redux/hooks/dataHooks';
 import * as d3 from 'd3';
+import { BaseCircles, BaseLines } from '../utils/index.js';
+import useRadarComponent from '../hooks/useRadarHooks';
+import PropTypes from 'prop-types';
 
-function RadarComponent({ config }) {
+function RadarComponent({
+  sectionsData,
+  setSectionsData,
+  targetsData,
+  settTargetsData,
+  showSections,
+  onClick,
+  onDrag,
+  config,
+}) {
   const svgRef = useRef(null);
-  const sectionsData = useSectionsSelector();
-  const targetsData = useTargetsSelector();
-  const initialConfig = useRadarComponent({ config, svgRef });
+  const initialConfig = useRadarComponent({
+    sectionsData,
+    setSectionsData,
+    targetsData,
+    settTargetsData,
+    onClick,
+    onDrag,
+    config,
+    svgRef,
+  });
   const radarConfigRef = useRef(initialConfig);
   const { northColor, northFontSize, radius, north } = radarConfigRef.current;
   const styles = {
@@ -23,6 +36,7 @@ function RadarComponent({ config }) {
       fontSize: 'calc(10px + 2vmin)',
     },
   };
+
   useEffect(() => {
     const {
       handleSectionClick,
@@ -39,6 +53,7 @@ function RadarComponent({ config }) {
       colorLines,
       strokeCircles,
       opacity,
+
       sectionLabelFontSize,
       sectionLabelFontWeight,
       sectionLabelDefaultColor,
@@ -68,7 +83,6 @@ function RadarComponent({ config }) {
       pointRectRy,
     } = initialConfig;
 
-    // Seleccionar el elemento SVG a través de la referencia y establecer sus atributos de ancho y alto
     // Check if a <g> element with class "radar-component" already exists
     let svg = d3.select('g.radar-component');
 
@@ -80,13 +94,14 @@ function RadarComponent({ config }) {
         .attr('height', height)
         .append('g')
         .attr('class', 'radar-component')
+        // Select SVG element via reference and set its width and height attributes
         .attr('transform', `translate(${width / 2}, ${height / 2})`);
     }
 
-    // Generar circulos
+    // Generate circles
     BaseCircles({ svg, numCircles, colorCircles, radius, strokeCircles });
 
-    // Definir ángulos para las líneas desde el centro hasta el radio máximo
+    // Define angles for lines from center to maximum radius
     const lineAngles = d3.range(numLines).map((i) => {
       return ((i * 360) / numLines) * (Math.PI / 180);
     });
@@ -99,15 +114,16 @@ function RadarComponent({ config }) {
       opacityLines,
       svg,
     });
-    // Crear un generador de pie
+
+    // Create a pie() builder
     const pie = d3
       .pie()
       .value((d) => d.value)
       .sort(null);
 
-    // Si existen sections se renderizan en el radar
-    if (sectionsData) {
-      // Seleccionar todos los grupos "arc" y enlazar los datos para las secciones
+    // If there are sections and the view is enabled, they are rendered on the radar
+    if (sectionsData && showSections) {
+      // Select all "arc" groups and bind data for sections
       const sections = svg
         .selectAll('.arc')
         .data(pie(sectionsData))
@@ -116,7 +132,7 @@ function RadarComponent({ config }) {
         .attr('id', (d) => `section-${d.data.label}`)
         .on('click', handleSectionClick);
 
-      // Definir un generador de arco para las secciones
+      // Define an arc generator for the sections
       const path = d3
         .arc()
         .outerRadius((d) => d.data.outerRadius * (radius - 3))
@@ -128,7 +144,7 @@ function RadarComponent({ config }) {
         )
         .endAngle((d) => d.data.endAngle * (Math.PI / 180));
 
-      // Agregar elementos de tipo "path" para las secciones
+      // Add path elements to sections
       sections
         .append('path')
         .attr('d', path)
@@ -145,7 +161,7 @@ function RadarComponent({ config }) {
         )
         .attr('stroke-width', sectionBorderStroke(radius));
 
-      // Agregar rectángulos como fondo para las etiquetas de las secciones
+      // Add rectangles as background for section labels
       sections
         .append('rect')
         .attr('x', (d) => {
@@ -171,7 +187,7 @@ function RadarComponent({ config }) {
         )
         .attr('stroke-width', sectionRecBorderSrtoke(radius));
 
-      // Agregar elementos de texto para las etiquetas de las secciones
+      // Add text elements for section labels
       sections
         .append('text')
         .attr('transform', (d) => {
@@ -193,9 +209,9 @@ function RadarComponent({ config }) {
         );
     }
 
-    // Si existen targets se renderizan en el radar
-    if (targetsData) {
-      // Definir un generador de arco para los puntos
+    // If targets exist and the view is enabled, they are rendered on the radar
+    if (targetsData && !showSections) {
+      // Define an arc generator for the points
       const pathPoint = d3
         .arc()
         .outerRadius((d) => d.data.radius * radius)
@@ -203,14 +219,14 @@ function RadarComponent({ config }) {
         .startAngle((d) => d.data.angle * (Math.PI / 180))
         .endAngle((d) => d.data.angle * (Math.PI / 180));
 
-      // Seleccionar todos los grupos "arc" y enlazar los datos para los puntos
+      // Select all "arc" groups and bind the data to the points
       const point = svg
         .selectAll('.arc')
         .data(pie(targetsData))
         .enter()
         .append('g');
 
-      // Agregar elementos de tipo "path" para los puntos
+      // Add path elements to points
       point
         .append('path')
         .attr('d', pathPoint)
@@ -218,7 +234,7 @@ function RadarComponent({ config }) {
         .attr('stroke', 'white')
         .attr('stroke-width', 2);
 
-      // Agregar rectángulos como fondo para las etiquetas de los puntos
+      // Add rectangles as background for point labels
       point
         .append('rect')
         .attr('x', (d) => {
@@ -246,7 +262,7 @@ function RadarComponent({ config }) {
         )
         .attr('stroke-width', pointBorderStroke);
 
-      // Agregar elementos de texto para las etiquetas de los puntos
+      // Add text elements for point labels
       point
         .append('text')
         .attr('transform', (d) => {
@@ -265,7 +281,7 @@ function RadarComponent({ config }) {
       point.call(d3.drag().on('end', handleTargetDragEnd));
     }
 
-    // Función de limpieza para eliminar todos los elementos del SVG al desmontar el componente
+    // Cleanup function to remove all elements from the SVG when unmounting the component
     return () => {
       svg.selectAll('*').remove();
     };
@@ -289,7 +305,41 @@ function RadarComponent({ config }) {
     </>
   );
 }
-RadarComponent.defaultProps = {
-  config: {},
+RadarComponent.propTypes = {
+  sectionsData: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      startAngle: PropTypes.number.isRequired,
+      endAngle: PropTypes.number.isRequired,
+      innerRadius: PropTypes.number.isRequired,
+      outerRadius: PropTypes.number.isRequired,
+      startElevation: PropTypes.number.isRequired,
+      endElevation: PropTypes.number.isRequired,
+      color: PropTypes.string.isRequired,
+      selected: PropTypes.bool.isRequired,
+      value: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  setSectionsData: PropTypes.func,
+  targetsData: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      angle: PropTypes.number.isRequired,
+      radius: PropTypes.number.isRequired,
+      elevation: PropTypes.number.isRequired,
+      color: PropTypes.string.isRequired,
+      selected: PropTypes.bool.isRequired,
+    })
+  ).isRequired,
+  settTargetsData: PropTypes.func,
+  showSections: PropTypes.bool,
+  onClick: PropTypes.func,
+  onDrag: PropTypes.func,
+  config: PropTypes.shape({
+    radius: PropTypes.string.isRequired,
+    colorCircles: PropTypes.string.isRequired,
+    strokeLines: PropTypes.number.isRequired,
+    strokeCircles: PropTypes.number.isRequired,
+  }).isRequired,
 };
 export default RadarComponent;

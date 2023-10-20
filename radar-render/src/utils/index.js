@@ -111,3 +111,25 @@ export const generateReferencesDOM = (section) => {
 
   return referencesClass;
 };
+
+export const addCirclesSVG = (section, drag, reference) => {
+  const svg = d3.select('svg');
+  const { cxStart, cyStart, cxEnd, cyEnd } = getCoordinatesCircles(section);
+
+  if (!reference.existCircleStart) {
+    let startCircle = svg
+      .append('circle')
+      .attr('class', reference.classStart)
+      .attr('r', 8);
+    startCircle.attr('cx', cxStart).attr('cy', cyStart);
+    startCircle.call(drag);
+  }
+  if (!reference.existCircleEnd) {
+    let endCircle = svg
+      .append('circle')
+      .attr('class', reference.classEnd)
+      .attr('r', 8);
+    endCircle.attr('cx', cxEnd).attr('cy', cyEnd);
+    endCircle.call(drag);
+  }
+};

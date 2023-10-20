@@ -1,6 +1,5 @@
 export const data = {
-  sections: [
-    // {label, startAngle, endAngle, innerRadius, outerRadius, startElevation, endElevation, color, selected},
+  sections: [ 
     {
       label: '1',
       startAngle: 12,
@@ -39,22 +38,45 @@ export const data = {
       selected: false,
       value: 10,
     },
-    // {
-    //   label: '4',
-    //   startAngle: 10,
-    //   endAngle: 60,
-    //   innerRadius: 0,
-    //   outerRadius: 1,
-    //   startElevation: 4,
-    //   endElevation: 2,
-    //   color: 'blue',
-    //   selected: false,
-    //   value: 10,
-    // },
+    {
+      label: '4',
+      startAngle: 10,
+      endAngle: 60,
+      innerRadius: 0,
+      outerRadius: 1,
+      startElevation: 4,
+      endElevation: 2,
+      color: 'blue',
+      selected: false,
+      value: 10,
+    },
   ],
 
   targets: [
-    //   // {label, angle, radius, elevation, color, selected},
+    {
+      label: '3',
+      angle: 90,
+      radius: 0.89,
+      elevation: 5,
+      color: 'purple',
+      selected: true,
+    },
+    {
+      label: '1',
+      angle: 340,
+      radius: 0.3,
+      elevation: 5,
+      color: 'orange',
+      selected: false,
+    },
+    {
+      label: '2',
+      angle: 160,
+      radius: 0.5,
+      elevation: 5,
+      color: 'blue',
+      selected: false,
+    },
   ],
 };
 
