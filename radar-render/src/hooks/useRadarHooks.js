@@ -1,23 +1,18 @@
-import { useDispatch } from 'react-redux';
 import {
-  changeEndAngle,
-  changeStartAngle,
-  saveItem,
-  saveSections,
-  saveTargets,
-} from '../../../../redux/slices/dataSlice';
-import {
-  useSectionsSelector,
-  useTargetsSelector,
-} from '../../../../redux/hooks/dataHooks';
-import * as d3 from 'd3';
-import {
-  setPositionCircle,
-  getCoordinatesCircles,
+  addCirclesSVG,
+  compareByEndElevation,
   generateReferencesDOM,
-} from '../../utils';
+  setPositionCircle,
+} from '../utils/index.js';
+import * as d3 from 'd3';
 
 export const useRadarComponent = ({
+  sectionsData,
+  setSectionsData,
+  targetsData,
+  settTargetsData,
+  onClick,
+  onDrag,
   config: {
     radius = 200,
     numCircles = 9,
@@ -62,51 +57,66 @@ export const useRadarComponent = ({
   },
   svgRef,
 }) => {
-  const dispatch = useDispatch();
-  const sectionsRedux = useSectionsSelector();
-  const targetsRedux = useTargetsSelector();
   const width = radius * 2;
   const height = width;
+
+  if (sectionsData) {
+    sectionsData.sort(compareByEndElevation);
+  }
+  if (targetsData) {
+    targetsData.sort(compareByEndElevation);
+  }
 
   const updateSelectedState = (dataArray, index) =>
     dataArray.map((data, idx) => ({ ...data, selected: idx === index }));
 
   const handleSectionClick = (event, section) => {
     event.stopPropagation();
-    const newSectionsData = updateSelectedState(sectionsRedux, section.index);
+    const newSectionsData = updateSelectedState(sectionsData, section.index);
     let newSection = newSectionsData.find(
       (section) => section.selected === true
     );
-    dispatch(saveItem(newSection));
-    dispatch(saveSections(newSectionsData));
     resetCircles(newSectionsData);
-
+    setSectionsData((prevState) => {
+      onClick(newSection);
+      return newSectionsData;
+    });
     let referencesClass = generateReferencesDOM(section.data);
-
     const drag = addEventDragCircles(section, newSection, referencesClass);
-    addCirclesSVG(section.data, drag, referencesClass);
+    setTimeout(() => {
+      addCirclesSVG(section.data, drag, referencesClass);
+    }, 0);
   };
 
-  const addCirclesSVG = (section, drag, reference) => {
-    const svg = d3.select('svg');
-    const { cxStart, cyStart, cxEnd, cyEnd } = getCoordinatesCircles(section);
+  const handleTargetsClick = (event, d) => {
+    event.stopPropagation();
+    const newTargetsData = updateSelectedState(targetsData, d.data.label);
+    if (sectionsData) {
+      const newSectionsData = updateSelectedState(sectionsData, null); // Unselect all sections
+      setSectionsData(newSectionsData);
+    }
+    settTargetsData(newTargetsData);
+    // const newSelectedTarget = { ...d.data, selected: true };
+    // onClick(newSelectedTarget);
+  };
 
-    if (!reference.existCircleStart) {
-      let startCircle = svg
-        .append('circle')
-        .attr('class', reference.classStart)
-        .attr('r', 8);
-      startCircle.attr('cx', cxStart).attr('cy', cyStart);
-      startCircle.call(drag);
-    }
-    if (!reference.existCircleEnd) {
-      let endCircle = svg
-        .append('circle')
-        .attr('class', reference.classEnd)
-        .attr('r', 8);
-      endCircle.attr('cx', cxEnd).attr('cy', cyEnd);
-      endCircle.call(drag);
-    }
+  const handleTargetDragEnd = (event, d) => {
+    const rad = Math.atan2(event.y, event.x);
+    let degrees = rad * (180 / Math.PI) + 90;
+    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
+    const hpMax = svgRef.current.getBoundingClientRect().width / 2;
+    const radius = hp / hpMax;
+
+    degrees = Math.round(degrees);
+
+    const newTargets = targetsData.map((target, index) => {
+      return {
+        ...target,
+        angle: index === d.index ? degrees : target.angle,
+        radius: index === d.index ? radius : target.radius,
+      };
+    });
+    settTargetsData(newTargets);
   };
 
   const addEventDragCircles = (section, newSection, reference) => {
@@ -129,16 +139,30 @@ export const useRadarComponent = ({
       .on('drag', function (event) {
         const degrees = getDegreesByEvent(event.x, event.y);
         if (d3.select(this).classed(reference.classStart)) {
-          const saveItemStart = { ...newSection, startAngle: degrees };
-          dispatch(saveItem(saveItemStart));
+          const saveItemStart = {
+            ...newSection,
+            startAngle: degrees,
+            start: true,
+          };
+          // dispatch(saveItem(saveItemStart));
           updateReduxAngles(degrees, section.index);
           setPositionCircle(saveItemStart, reference, true);
+          if (typeof onDrag === 'function') {
+            onDrag(saveItemStart);
+          }
         }
         if (d3.select(this).classed(reference.classEnd)) {
-          const saveItemEnd = { ...newSection, endAngle: degrees };
-          dispatch(saveItem(saveItemEnd));
+          const saveItemEnd = {
+            ...newSection,
+            endAngle: degrees,
+            start: false,
+          };
+          // dispatch(saveItem(saveItemEnd));
           updateReduxAngles(degrees, section.index, false);
-          setPositionCircle(saveItemEnd, reference, false);
+          setPositionCircle(saveItemEnd, reference);
+          if (typeof onDrag === 'function') {
+            onDrag(saveItemEnd, false);
+          }
         }
       });
 
@@ -171,40 +195,18 @@ export const useRadarComponent = ({
 
   const updateReduxAngles = (degrees, index, start = true) => {
     if (start) {
-      dispatch(changeStartAngle({ index, degrees }));
+      setSectionsData((prevSectionsData) => {
+        return prevSectionsData.map((item, idx) =>
+          idx === index ? { ...item, startAngle: degrees } : item
+        );
+      });
     } else {
-      dispatch(changeEndAngle({ index, degrees }));
+      setSectionsData((prevSectionsData) => {
+        return prevSectionsData.map((item, idx) =>
+          idx === index ? { ...item, endAngle: degrees } : item
+        );
+      });
     }
-  };
-
-  const handleTargetsClick = (event, d) => {
-    const newTargetsData = updateSelectedState(targetsRedux, d.data.label);
-    dispatch(
-      saveItem(newTargetsData.find((target) => target.selected === true))
-    );
-  };
-
-  const handleTargetDragEnd = (event, d) => {
-    const rad = Math.atan2(event.y, event.x);
-    let degrees = rad * (180 / Math.PI) + 90;
-    const hp = Math.sqrt(Math.pow(event.y, 2) + Math.pow(event.x, 2));
-    const hpMax = svgRef.current.getBoundingClientRect().width / 2;
-    const radius = hp / hpMax;
-
-    degrees = Math.round(degrees);
-
-    const newTargets = targetsRedux.map((target, index) => {
-      return {
-        ...target,
-        angle: index === d.index ? degrees : target.angle,
-        radius: index === d.index ? radius : target.radius,
-      };
-    });
-    dispatch(saveTargets(newTargets));
-    const newTargetsData = updateSelectedState(targetsRedux, d.data.label);
-    dispatch(
-      saveItem(newTargetsData.find((target) => target.selected === true))
-    );
   };
 
   return {

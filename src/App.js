@@ -1,49 +1,69 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import { DataTable, RadarComponent, Slider } from './components';
+import { DataTable, Slider } from './components';
 import { data, dataDos } from './data';
 import Button from '@mui/material/Button';
-import { useDispatch } from 'react-redux';
 import {
-  saveItem,
-  saveSections,
-  saveTargets,
-  sortSections,
-} from './redux/slices/dataSlice';
-import { useDataSelector } from './redux/hooks/dataHooks';
-import * as d3 from 'd3';
+  RadarComponent,
+  ReferenceSectionSVG,
+  UpdatePositionCircle,
+} from 'radar-render';
 
 function App() {
-  const dispatch = useDispatch();
-  const dataRedux = useDataSelector();
-  const [selectedRow, setSelectedRow] = useState();
-  const [currentData, setCurrentData] = useState(dataRedux);
-
-  const [disabled, setDisabled] = useState(false);
-
-  const saveSelectedRow = () => {
-    const selectedData = dataRedux.sections.find(
-      (section) => section.selected === true
-    );
-
-    setSelectedRow(selectedData);
-    dispatch(saveItem(selectedData));
+  const [showSections, setShowSections] = useState(true);
+  const [sectionsData, setSectionsData] = useState(data.sections);
+  const [targetsData, settTargetsData] = useState(data.targets);
+  const [selectedRow, setSelectedRow] = useState(
+    data.sections.find((section) => section.selected) ?? data.sections[0]
+  );
+  const [currentData, setCurrentData] = useState(data);
+  const onClick = (row) => {
+    setSelectedRow(row);
   };
 
-  const verifySeletectionSection = () => {
-    const circleElement = d3.select(`#section-${selectedRow?.label}`).node();
-    if (circleElement) {
-      d3.select(circleElement).dispatch('click');
+  const onChange = (newValues, activeThumb, isChangeRadius = false) => {
+    let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
+
+    if (startAngle < 0) {
+      startAngle += 360;
+    }
+    if (endAngle < 0) {
+      endAngle += 360;
+    }
+
+    const newSelectedRow = {
+      ...selectedRow,
+      startAngle: startAngle,
+      endAngle: endAngle,
+      innerRadius: innerRadius,
+      outerRadius: outerRadius,
+    };
+
+    const objetoExistenteIndex = sectionsData.findIndex(
+      (obj) => obj.label === newSelectedRow.label
+    );
+
+    if (objetoExistenteIndex !== -1) {
+      const dataSectionsCopy = [...sectionsData];
+      dataSectionsCopy.map((section) => section.selected === false);
+      dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
+      setSectionsData(dataSectionsCopy);
+      const reference = ReferenceSectionSVG(newSelectedRow);
+      if (isChangeRadius) {
+        UpdatePositionCircle(newSelectedRow, reference, true);
+        UpdatePositionCircle(newSelectedRow, reference, false);
+      } else {
+        UpdatePositionCircle(newSelectedRow, reference, !activeThumb);
+      }
     }
   };
 
-  useEffect(() => {
-    dispatch(sortSections());
-    saveSelectedRow();
-    verifySeletectionSection();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRow]);
+  // const verifySeletectionSection = () => {
+  //   const circleElement = d3.select(`#section-${selectedRow?.label}`).node();
+  //   if (circleElement) {
+  //     d3.select(circleElement).dispatch('click');
+  //   }
+  // };
 
   return (
     <div className="App">
@@ -58,27 +78,38 @@ function App() {
               top: '18px',
             }}
             onClick={() => {
-              if (dataRedux.sections.length) {
-                dispatch(saveTargets(dataDos.targets));
-                dispatch(saveSections([]));
-              } else {
-                dispatch(saveTargets([]));
-                dispatch(saveSections(data.sections));
-                saveSelectedRow();
-              }
-              setCurrentData(dataRedux.sections.length ? dataDos : data);
-              setDisabled(!disabled);
+              setCurrentData(currentData.sections.length ? dataDos : data);
+              setShowSections(!showSections);
             }}
           >
             Change Mode
           </Button>
-          <DataTable />
-          <div style={{ visibility: disabled ? 'hidden' : 'visible' }}>
-            {selectedRow ? <Slider key={JSON.stringify(selectedRow)} /> : null}
+          <DataTable
+            showSections={showSections}
+            targets={targetsData}
+            sections={sectionsData}
+            onClick={onClick}
+            selectedRow={selectedRow}
+          />
+          <div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
+            <Slider
+              key={JSON.stringify(selectedRow)}
+              selectedRow={selectedRow}
+              onChange={onChange}
+            />
           </div>
         </div>
         <RadarComponent
           key={JSON.stringify(currentData)}
+          sectionsData={sectionsData}
+          setSectionsData={setSectionsData}
+          targetsData={targetsData}
+          settTargetsData={settTargetsData}
+          showSections={showSections}
+          onClick={onClick}
+          onDrag={(updatedValue) => {
+            setSelectedRow(updatedValue);
+          }}
           config={{
             radius: '280',
             colorCircles: 'rgb(0, 189, 88)',
@@ -90,5 +121,4 @@ function App() {
     </div>
   );
 }
-
 export default App;

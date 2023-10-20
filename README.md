@@ -13,13 +13,12 @@ example online: https://punteriacero.github.io/torta/
 - When clicking an element or section, it is returned in the onclick function received by props.
 - Use **react redux** tool to configurate data information. `data` is an object of data containing the necessary information for the visualization.
 
-
 ## Used technology
 
 - React
 - D3.js
 
-## functional limitations 
+## functional limitations
 
 - If a section is covered by another, it is not selectable.
 - If a point is in the same position as another, it is not selectable.
@@ -27,30 +26,44 @@ example online: https://punteriacero.github.io/torta/
 
 ## Available Properties
 
-- `config`: style config.
+- `sectionsData`: State variables are used to store and manage data that can change over time, this containing the necessary information for the visualization.
+- `setSectionsData`: State setter function that is used to update the value of a state variable named sectionsData.
+- `targetsData`: State variables are used to store and manage data that can change over time, this containing the necessary information for the visualization.
+- `settTargetsData`: State setter function that is used to update the value of a state variable named targetsData.
+- `showSections`: Boolean that valid if show section or target.
+- `onClick`: A click event handler function called when a section or point is clicked.
+- `onDrag`: A drag event handler function called when a section or point is dragged.
+- `config`: Style config in object.
+  configuration required: - radius - colorCircles - strokeLines - strokeCircles
+
+      config={{
+            radius: '280',
+            colorCircles: 'rgb(0, 189, 88)',
+            strokeLines: 2,
+            strokeCircles: 2,
+          }}
 
 ## Available Data Properties
 
 - `sections`: sections array(Example Value:`{label, startAngle, endAngle, innerRadius, outerRadius, startElevation, endElevation, color, selected}`).
-	- label:string(key)
-	- startAngle:number(0-360)
-	- endAngle:number(0-360)
-	- innerRadius:number(0-1)
-	- outerRadius:number(0-1)
-	- startElevation:number
-	- endElevation:number
-	- color:string
-	- selected:boolean
+
+  - label:string(key)
+  - startAngle:number(0-360)
+  - endAngle:number(0-360)
+  - innerRadius:number(0-1)
+  - outerRadius:number(0-1)
+  - startElevation:number
+  - endElevation:number
+  - color:string
+  - selected:boolean
 
 - `targets`: sections array(Example Value:`{label, angle, radius, elevation, color, selected}`).
-	- label:string(key)
-	- angle:number(0-360)
-	- radius:number(0-1)
-	- elevation:number
-	- color:string
-	- selected:boolean
-
-
+  - label:string(key)
+  - angle:number(0-360)
+  - radius:number(0-1)
+  - elevation:number
+  - color:string
+  - selected:boolean
 
 ## Available Config Properties
 
@@ -64,7 +77,6 @@ example online: https://punteriacero.github.io/torta/
 - `colorLines`: The color of the lines originating from the center of the circle. (Default value: `"green"`).
 - `north`: The label indicating the north direction. (Default value: `"N"`).
 - `opacity`: The opacity of elements in the visualization. (Default value: `0.4`).
-
 
 - `sectionLabelFontSize`: The font size for section labels. (Default value: `"12px"`).
 - `sectionLabelFontWeight`: The font weight for section labels. (Default value: `"bold"`).
@@ -82,7 +94,6 @@ example online: https://punteriacero.github.io/torta/
 - `selectedSectionRecBorderColor`: The border color of selected section rectangles. (Default value: `"black"`).
 - `unselectedSectionRecBorderColor`: The border color of unselected section rectangles. (Default value: `"white"`).
 
-
 - `pointLabelFontSize`: The font size for point labels. (Default value: `"12px"`).
 - `pointLabelFontWeight`: The font weight for point labels. (Default value: `"bold"`).
 - `pointLabelTextColor`: The font color for point labels. (Default value: `"whitesmoke"`).
@@ -95,3 +106,70 @@ example online: https://punteriacero.github.io/torta/
 - `selectedPointStrokeColor`: The border color of selected points. (Default value: `"white"`).
 - `pointRectRx`: The horizontal radius of the corners of point rectangles. (Default value: `12`).
 - `pointRectRy`: The vertical radius of the corners of point rectangles. (Default value: `12`).
+
+## Updating and Publishing Package to npm
+
+This guide will walk you through the process of updating and publishing your package to the npm registry using Rollup.
+
+### Step 1: Update Package Version
+
+**Option 1**
+
+1. Open your package.json file of your package (radar-render)
+2. Locate the version field.
+3. Update the version number according to semantic versioning.
+   - For example, you can use patch, minor, or major version bumps.
+4. Save the package.json file.
+
+**Option 2**
+
+1. Open your terminal and go to the package location and follow these commands.
+
+```sh
+cd radar-compoment
+npm version <update_type>
+```
+
+> Note: Replace <update_type> with one of the following options:
+>
+> - patch: for small, backwards-compatible bug fixes.
+> - minor: for adding new features in a backwards-compatible manner.
+> - major: for making incompatible API changes.
+
+### Step 2: Build the Package
+
+1. Open your terminal or command prompt.
+2. Run the build command:
+
+```sh
+npm run build
+```
+
+> Note: This will bundle your code according to the configuration in `rollup.config.js.`
+
+### Step 3: Publish to npm
+
+1. Log in to your npm account (if not already logged in):
+
+```sh
+npm login
+```
+
+Follow the prompts to log in.
+
+2. Publish your package:
+
+```sh
+npm publish
+```
+
+This will upload your package to the npm registry.
+
+### Step 4: Version Control
+1. Commit the changes to your version control system (e.g., Git):
+
+```sh
+git add .
+git commit -m "chore(release): bump version to X.Y.Z"
+git push
+```
