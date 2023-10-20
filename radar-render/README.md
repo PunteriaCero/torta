@@ -44,6 +44,7 @@ example online: https://punteriacero.github.io/torta/
           }}
 
 <a id="config-properties"></a>
+
 ## Available Data Properties
 
 - `sections`: sections array(Example Value:`{label, startAngle, endAngle, innerRadius, outerRadius, startElevation, endElevation, color, selected}`).
@@ -142,7 +143,7 @@ import {
   sections={sectionsData}
   setSections={setSectionsData}
   targets={targetsData}
-  settTargets={settTargetsData}
+  setTargets={setTargetsData}
   showSections={showSections} // if true then render pie with the sections, if is not then render radar with the targets
   onClick={onClick} // return the object that was clicked
   onDrag={(updatedValue) => {
@@ -179,17 +180,250 @@ import {
 
 ```js
 <div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
-            <Slider
-              key={JSON.stringify(selectedRow)}
-              selectedRow={selectedRow} // pass selected row
-              onChange={onChange} // callback to update the position and angle of the sections
-            />
-          </div>
+  <Slider
+    key={JSON.stringify(selectedRow)}
+    sections={sectionsData} // pass sections data
+    setSections={setSectionsData} 
+    selectedRow={selectedRow} // pass selected row
+  />
+</div>
 ```
 
-This is an implementation of `onChange` event:
+## Demo
+### App.js
 
 ```js
+import React, { useState } from 'react';
+import './App.css';
+import { DataTable, Slider } from './components';
+import { data, dataDos } from './data';
+import Button from '@mui/material/Button';
+import { RadarComponent } from 'radar-render';
+
+function App() {
+  const [showSections, setShowSections] = useState(true);
+  const [sectionsData, setSectionsData] = useState(data.sections);
+  const [targetsData, settTargetsData] = useState(data.targets);
+  const [selectedRow, setSelectedRow] = useState(
+    data.sections.find((section) => section.selected) ?? data.sections[0]
+  );
+  const [currentData, setCurrentData] = useState(data);
+  const onClick = (row) => {
+    setSelectedRow(row);
+  };
+
+  return (
+    <div className="App">
+      <div className="container">
+        <div className="tableContainer">
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: 'black',
+              width: '100%',
+              position: 'relative',
+              top: '18px',
+            }}
+            onClick={() => {
+              setCurrentData(currentData.sections.length ? dataDos : data);
+              setShowSections(!showSections);
+            }}
+          >
+            Change Mode
+          </Button>
+          <DataTable
+            showSections={showSections}
+            targets={targetsData}
+            sections={sectionsData}
+            selectedRow={selectedRow}
+          />
+          <div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
+            <Slider
+              key={JSON.stringify(selectedRow)}
+              selectedRow={selectedRow}
+              sections={sectionsData}
+              setSections={setSectionsData}
+            />
+          </div>
+        </div>
+        <RadarComponent
+          key={JSON.stringify(currentData)}
+          sections={sectionsData}
+          setSections={setSectionsData}
+          targets={targetsData}
+          settTargets={settTargetsData}
+          showSections={showSections}
+          onClick={onClick}
+          onDrag={(updatedValue) => {
+            setSelectedRow(updatedValue);
+          }}
+          config={{
+            radius: '280',
+            colorCircles: 'rgb(0, 189, 88)',
+            strokeLines: 2,
+            strokeCircles: 2,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+export default App;
+```
+
+### DataTable.js
+```js
+import React from 'react';
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
+
+export default function CustomizedTables({
+  showSections,
+  sections,
+  targets,
+  selectedRow,
+}) {
+  return (
+    <TableContainer component={Paper}>
+      <Table
+        sx={{ minWidth: 700 }}
+        style={{ backgroundColor: 'rgb(37, 36, 36)', borderRadius: '10px' }}
+        aria-label="customized table"
+      >
+        <TableHead>
+          {
+            showSections ? (
+              <TableRow>
+                <StyledTableCell align="center">Label</StyledTableCell>
+                <StyledTableCell align="center">Start Angle</StyledTableCell>
+                <StyledTableCell align="center">End Angle</StyledTableCell>
+                <StyledTableCell align="center">Inner Radius</StyledTableCell>
+                <StyledTableCell align="center">Outer Radius</StyledTableCell>
+              </TableRow>
+            ) : (
+              <TableRow>
+                <StyledTableCell align="center">Label</StyledTableCell>
+                <StyledTableCell align="center">Angle</StyledTableCell>
+                <StyledTableCell align="center">Radius</StyledTableCell>
+              </TableRow>
+            ) // Targets
+          }
+        </TableHead>
+        <TableBody>
+          {showSections
+            ? sections.map((row) => (
+                <StyledTableRow
+                  key={row.label}
+                  style={{
+                    backgroundColor:
+                      selectedRow?.label === row.label
+                        ? 'rgb(0, 189, 88)'
+                        : 'rgb(82, 82, 82)',
+                  }}
+                >
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.label}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.startAngle}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.endAngle}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {Math.trunc(row.innerRadius * 100)}
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ color: 'white' }}>
+                    {Math.trunc(row.outerRadius * 100)}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            : targets.map((row) => (
+                <StyledTableRow
+                  key={row.label}
+                  style={{
+                    backgroundColor:
+                      selectedRow?.label === row.label
+                        ? 'rgb(0, 189, 88)'
+                        : 'rgb(82, 82, 82)',
+                  }}
+                >
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.label}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {row.angle}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ color: 'white' }} align="center">
+                    {Math.round(row.radius * 100)}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+```
+### Slider.js
+```js
+import React, { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
+import { ReferenceSectionSVG, UpdatePositionCircle } from 'radar-render';
+
+function valuetext(value) {
+  return `${value}`;
+}
+
+export default function MinimumDistanceSlider({
+  sections,
+  setSections,
+  selectedRow,
+}) {
+  const [value1, setValue1] = useState([
+    selectedRow.startAngle,
+    selectedRow.endAngle,
+  ]);
+  const [value2, setValue2] = useState([
+    Math.trunc(selectedRow.innerRadius * 100),
+    Math.trunc(selectedRow.outerRadius * 100),
+  ]);
+
+  useEffect(() => {
+    setValue1([selectedRow.startAngle, selectedRow.endAngle]);
+    setValue2([
+      Math.trunc(selectedRow.innerRadius * 100),
+      Math.trunc(selectedRow.outerRadius * 100),
+    ]);
+  }, [selectedRow]);
 
 /**
  * Handles changes in the values of a slider component.
@@ -198,7 +432,7 @@ This is an implementation of `onChange` event:
  * @param activeThumb - The index of the active thumb that indicate if  start or end angle is changing.
  * @param [isChangeRadius=false] - Indicates if the radius is cahnging or not.
  */
-const onChange = (newValues, activeThumb, isChangeRadius = false) => {
+  const onChange = (newValues, activeThumb, isChangeRadius = false) => {
     let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
 
     if (startAngle < 0) {
@@ -216,23 +450,102 @@ const onChange = (newValues, activeThumb, isChangeRadius = false) => {
       outerRadius: outerRadius,
     };
 
-    const objetoExistenteIndex = sectionsData.findIndex(
+    const objetoExistenteIndex = sections.findIndex(
       (obj) => obj.label === newSelectedRow.label
     );
 
     if (objetoExistenteIndex !== -1) {
-      const dataSectionsCopy = [...sectionsData];
+      const dataSectionsCopy = [...sections];
       dataSectionsCopy.map((section) => section.selected === false);
       dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
-      setSectionsData(dataSectionsCopy); // update section data
+      setSections(dataSectionsCopy);
       const reference = ReferenceSectionSVG(newSelectedRow);
-      if (isChangeRadius) { // if true update both circles start and end.
+      if (isChangeRadius) {
         UpdatePositionCircle(newSelectedRow, reference, true);
         UpdatePositionCircle(newSelectedRow, reference, false);
-      } else {// if false update start or end depends on activeThumb
+      } else {
         UpdatePositionCircle(newSelectedRow, reference, !activeThumb);
       }
     }
   };
-  ```
+
+  const handleChange1 = (event, newValue, activeThumb) => {
+    const newValues = [
+      newValue[0],
+      newValue[1],
+      value2[0] / 100,
+      value2[1] / 100,
+    ];
+
+    // Mantener una distancia de 5 unidades en el rango -360 a 360
+    if (newValue[1] - newValue[0] < 5) {
+      if (activeThumb === 0) {
+        const clamped = Math.max(newValue[0], -360 + 5);
+        setValue1([clamped, clamped + 5]);
+      } else {
+        const clamped = Math.min(newValue[1], 360 - 5);
+        setValue1([clamped - 5, clamped]);
+      }
+    } else {
+      setValue1(newValue);
+    }
+
+    onChange(newValues, activeThumb);
+  };
+
+  const handleChange2 = (event, newValue, activeThumb) => {
+    const newValues = [
+      value1[0],
+      value1[1],
+      newValue[0] / 100,
+      newValue[1] / 100,
+    ];
+
+    if (newValue[1] - newValue[0] < 5) {
+      if (activeThumb === 0) {
+        const clamped = Math.min(newValue[0], 100 - 5);
+        setValue2([clamped, clamped + 5]);
+      } else {
+        const clamped = Math.max(newValue[1], 5);
+        setValue2([clamped - 5, clamped]);
+      }
+    } else {
+      setValue2(newValue);
+    }
+    onChange(newValues, activeThumb, true);
+  };
+
+  return (
+    <Box sx={{ width: 600 }}>
+      <div style={{ color: 'whitesmoke' }}>Angle</div>
+      <Slider
+        getAriaLabel={() => 'Minimum distance'}
+        value={value1}
+        onChange={handleChange1}
+        min={-360}
+        max={360}
+        size="small"
+        valueLabelDisplay="on"
+        valueLabelFormat={(value) => `${value < 0 ? value + 360 : value}°`}
+        disableSwap
+      />
+      <br />
+      <br />
+      <div style={{ color: 'whitesmoke' }}>Radius</div>
+      <Slider
+        getAriaLabel={() => 'Minimum distance shift'}
+        value={value2}
+        onChange={handleChange2}
+        min={0}
+        max={100}
+        size="small"
+        valueLabelDisplay="on"
+        getAriaValueText={valuetext}
+        disableSwap
+      />
+    </Box>
+  );
+}
+```
+
 > Note: with this function you can change the slider and affect the radar component Radar and update the angles and radius of the selected row.
