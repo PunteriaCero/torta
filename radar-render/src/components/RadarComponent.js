@@ -53,7 +53,6 @@ function RadarComponent({
       colorLines,
       strokeCircles,
       opacity,
-
       sectionLabelFontSize,
       sectionLabelFontWeight,
       sectionLabelDefaultColor,
@@ -124,7 +123,7 @@ function RadarComponent({
     // If there are sections and the view is enabled, they are rendered on the radar
     if (sections && showSections) {
       // Select all "arc" groups and bind data for sections
-      const sections = svg
+      const sectionsSvg = svg
         .selectAll('.arc')
         .data(pie(sections))
         .enter()
@@ -145,7 +144,7 @@ function RadarComponent({
         .endAngle((d) => d.data.endAngle * (Math.PI / 180));
 
       // Add path elements to sections
-      sections
+      sectionsSvg
         .append('path')
         .attr('d', path)
         .attr('fill', (d) => d.data.color)
@@ -162,7 +161,7 @@ function RadarComponent({
         .attr('stroke-width', sectionBorderStroke(radius));
 
       // Add rectangles as background for section labels
-      sections
+      sectionsSvg
         .append('rect')
         .attr('x', (d) => {
           const centroid = path.centroid(d);
@@ -188,7 +187,7 @@ function RadarComponent({
         .attr('stroke-width', sectionRecBorderSrtoke(radius));
 
       // Add text elements for section labels
-      sections
+      sectionsSvg
         .append('text')
         .attr('transform', (d) => {
           const centroid = path.centroid(d);

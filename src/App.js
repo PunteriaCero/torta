@@ -3,11 +3,7 @@ import './App.css';
 import { DataTable, Slider } from './components';
 import { data, dataDos } from './data';
 import Button from '@mui/material/Button';
-import {
-  RadarComponent,
-  ReferenceSectionSVG,
-  UpdatePositionCircle,
-} from 'radar-render';
+import { RadarComponent } from 'radar-render';
 
 function App() {
   const [showSections, setShowSections] = useState(true);
@@ -20,50 +16,6 @@ function App() {
   const onClick = (row) => {
     setSelectedRow(row);
   };
-
-  const onChange = (newValues, activeThumb, isChangeRadius = false) => {
-    let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
-
-    if (startAngle < 0) {
-      startAngle += 360;
-    }
-    if (endAngle < 0) {
-      endAngle += 360;
-    }
-
-    const newSelectedRow = {
-      ...selectedRow,
-      startAngle: startAngle,
-      endAngle: endAngle,
-      innerRadius: innerRadius,
-      outerRadius: outerRadius,
-    };
-
-    const objetoExistenteIndex = sectionsData.findIndex(
-      (obj) => obj.label === newSelectedRow.label
-    );
-
-    if (objetoExistenteIndex !== -1) {
-      const dataSectionsCopy = [...sectionsData];
-      dataSectionsCopy.map((section) => section.selected === false);
-      dataSectionsCopy[objetoExistenteIndex] = newSelectedRow;
-      setSectionsData(dataSectionsCopy);
-      const reference = ReferenceSectionSVG(newSelectedRow);
-      if (isChangeRadius) {
-        UpdatePositionCircle(newSelectedRow, reference, true);
-        UpdatePositionCircle(newSelectedRow, reference, false);
-      } else {
-        UpdatePositionCircle(newSelectedRow, reference, !activeThumb);
-      }
-    }
-  };
-
-  // const verifySeletectionSection = () => {
-  //   const circleElement = d3.select(`#section-${selectedRow?.label}`).node();
-  //   if (circleElement) {
-  //     d3.select(circleElement).dispatch('click');
-  //   }
-  // };
 
   return (
     <div className="App">
@@ -87,14 +39,15 @@ function App() {
           <DataTable
             showSections={showSections}
             targets={targetsData}
-            sections={sectionsData} 
+            sections={sectionsData}
             selectedRow={selectedRow}
           />
           <div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
             <Slider
               key={JSON.stringify(selectedRow)}
               selectedRow={selectedRow}
-              onChange={onChange}
+              sections={sectionsData}
+              setSections={setSectionsData}
             />
           </div>
         </div>
