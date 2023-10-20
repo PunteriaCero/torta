@@ -1,8 +1,33 @@
 {
   "name": "radar-render",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Render sections and targets on a radar",
+  "keywords": [
+    "d3js",
+    "react",
+    "render",
+    "pie",
+    "targets",
+    "radar"
+  ],
   "main": "dist/index.cjs.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PunteriaCero/torta/tree/main/radar-render"
+  },
+  "authors": [
+    "Enrique Villón <evillon@baufest.com>",
+    "Hernan Lavrencic <hlavrencic@baufest.com>",
+    "Lucio Penza <lpenza@baufest.com>",
+    "Luis Puerto <lpuerto@baufest.com>",
+    "Michael Keb <mikebizne@gmail.com>"
+  ],
+  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c",
+    "build:webpack": "webpack"
+  },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "@reduxjs/toolkit": "^1.9.7",
@@ -14,13 +39,6 @@
     "redux": "^4.2.1",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c",
-    "build:webpack": "webpack"
-  },
-  "author": "",
-  "license": "ISC",
   "peerDependencies": {
     "react": ">=15.0.1",
     "react-dom": ">=15.0.1"

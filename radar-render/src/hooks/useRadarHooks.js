@@ -7,10 +7,10 @@ import {
 import * as d3 from 'd3';
 
 export const useRadarComponent = ({
-  sectionsData,
-  setSectionsData,
-  targetsData,
-  settTargetsData,
+  sections,
+  setSections,
+  targets,
+  settTargets,
   onClick,
   onDrag,
   config: {
@@ -60,11 +60,11 @@ export const useRadarComponent = ({
   const width = radius * 2;
   const height = width;
 
-  if (sectionsData) {
-    sectionsData.sort(compareByEndElevation);
+  if (sections) {
+    sections.sort(compareByEndElevation);
   }
-  if (targetsData) {
-    targetsData.sort(compareByEndElevation);
+  if (targets) {
+    targets.sort(compareByEndElevation);
   }
 
   const updateSelectedState = (dataArray, index) =>
@@ -72,12 +72,12 @@ export const useRadarComponent = ({
 
   const handleSectionClick = (event, section) => {
     event.stopPropagation();
-    const newSectionsData = updateSelectedState(sectionsData, section.index);
+    const newSectionsData = updateSelectedState(sections, section.index);
     let newSection = newSectionsData.find(
       (section) => section.selected === true
     );
     resetCircles(newSectionsData);
-    setSectionsData((prevState) => {
+    setSections((prevState) => {
       onClick(newSection);
       return newSectionsData;
     });
@@ -90,12 +90,12 @@ export const useRadarComponent = ({
 
   const handleTargetsClick = (event, d) => {
     event.stopPropagation();
-    const newTargetsData = updateSelectedState(targetsData, d.data.label);
-    if (sectionsData) {
-      const newSectionsData = updateSelectedState(sectionsData, null); // Unselect all sections
-      setSectionsData(newSectionsData);
+    const newTargetsData = updateSelectedState(targets, d.data.label);
+    if (sections) {
+      const newSectionsData = updateSelectedState(sections, null); // Unselect all sections
+      setSections(newSectionsData);
     }
-    settTargetsData(newTargetsData);
+    settTargets(newTargetsData);
     // const newSelectedTarget = { ...d.data, selected: true };
     // onClick(newSelectedTarget);
   };
@@ -109,14 +109,14 @@ export const useRadarComponent = ({
 
     degrees = Math.round(degrees);
 
-    const newTargets = targetsData.map((target, index) => {
+    const newTargets = targets.map((target, index) => {
       return {
         ...target,
         angle: index === d.index ? degrees : target.angle,
         radius: index === d.index ? radius : target.radius,
       };
     });
-    settTargetsData(newTargets);
+    settTargets(newTargets);
   };
 
   const addEventDragCircles = (section, newSection, reference) => {
@@ -195,13 +195,13 @@ export const useRadarComponent = ({
 
   const updateReduxAngles = (degrees, index, start = true) => {
     if (start) {
-      setSectionsData((prevSectionsData) => {
+      setSections((prevSectionsData) => {
         return prevSectionsData.map((item, idx) =>
           idx === index ? { ...item, startAngle: degrees } : item
         );
       });
     } else {
-      setSectionsData((prevSectionsData) => {
+      setSections((prevSectionsData) => {
         return prevSectionsData.map((item, idx) =>
           idx === index ? { ...item, endAngle: degrees } : item
         );

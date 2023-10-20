@@ -5,10 +5,10 @@ import useRadarComponent from '../hooks/useRadarHooks';
 import PropTypes from 'prop-types';
 
 function RadarComponent({
-  sectionsData,
-  setSectionsData,
-  targetsData,
-  settTargetsData,
+  sections,
+  setSections,
+  targets,
+  settTargets,
   showSections,
   onClick,
   onDrag,
@@ -16,10 +16,10 @@ function RadarComponent({
 }) {
   const svgRef = useRef(null);
   const initialConfig = useRadarComponent({
-    sectionsData,
-    setSectionsData,
-    targetsData,
-    settTargetsData,
+    sections,
+    setSections,
+    targets,
+    settTargets,
     onClick,
     onDrag,
     config,
@@ -122,11 +122,11 @@ function RadarComponent({
       .sort(null);
 
     // If there are sections and the view is enabled, they are rendered on the radar
-    if (sectionsData && showSections) {
+    if (sections && showSections) {
       // Select all "arc" groups and bind data for sections
       const sections = svg
         .selectAll('.arc')
-        .data(pie(sectionsData))
+        .data(pie(sections))
         .enter()
         .append('g')
         .attr('id', (d) => `section-${d.data.label}`)
@@ -210,7 +210,7 @@ function RadarComponent({
     }
 
     // If targets exist and the view is enabled, they are rendered on the radar
-    if (targetsData && !showSections) {
+    if (targets && !showSections) {
       // Define an arc generator for the points
       const pathPoint = d3
         .arc()
@@ -222,7 +222,7 @@ function RadarComponent({
       // Select all "arc" groups and bind the data to the points
       const point = svg
         .selectAll('.arc')
-        .data(pie(targetsData))
+        .data(pie(targets))
         .enter()
         .append('g');
 
@@ -306,7 +306,7 @@ function RadarComponent({
   );
 }
 RadarComponent.propTypes = {
-  sectionsData: PropTypes.arrayOf(
+  sections: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       startAngle: PropTypes.number.isRequired,
@@ -320,8 +320,8 @@ RadarComponent.propTypes = {
       value: PropTypes.number.isRequired,
     })
   ).isRequired,
-  setSectionsData: PropTypes.func,
-  targetsData: PropTypes.arrayOf(
+  setSections: PropTypes.func,
+  targets: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       angle: PropTypes.number.isRequired,
@@ -331,7 +331,7 @@ RadarComponent.propTypes = {
       selected: PropTypes.bool.isRequired,
     })
   ).isRequired,
-  settTargetsData: PropTypes.func,
+  settTargets: PropTypes.func,
   showSections: PropTypes.bool,
   onClick: PropTypes.func,
   onDrag: PropTypes.func,

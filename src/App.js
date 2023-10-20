@@ -87,8 +87,7 @@ function App() {
           <DataTable
             showSections={showSections}
             targets={targetsData}
-            sections={sectionsData}
-            onClick={onClick}
+            sections={sectionsData} 
             selectedRow={selectedRow}
           />
           <div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
@@ -101,10 +100,10 @@ function App() {
         </div>
         <RadarComponent
           key={JSON.stringify(currentData)}
-          sectionsData={sectionsData}
-          setSectionsData={setSectionsData}
-          targetsData={targetsData}
-          settTargetsData={settTargetsData}
+          sections={sectionsData}
+          setSections={setSectionsData}
+          targets={targetsData}
+          settTargets={settTargetsData}
           showSections={showSections}
           onClick={onClick}
           onDrag={(updatedValue) => {
