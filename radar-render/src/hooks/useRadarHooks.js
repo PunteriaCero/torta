@@ -76,7 +76,6 @@ export const useRadarComponent = ({
     let newSection = newSectionsData.find(
       (section) => section.selected === true
     );
-    resetCircles(newSectionsData);
     setSections((prevState) => {
       onClick(newSection);
       return newSectionsData;
@@ -84,6 +83,7 @@ export const useRadarComponent = ({
     let referencesClass = generateReferencesDOM(section.data);
     const drag = addEventDragCircles(section, newSection, referencesClass);
     setTimeout(() => {
+      resetCircles(newSectionsData);
       addCirclesSVG(section.data, drag, referencesClass);
     }, 0);
   };
@@ -96,8 +96,6 @@ export const useRadarComponent = ({
       setSections(newSectionsData);
     }
     settTargets(newTargetsData);
-    // const newSelectedTarget = { ...d.data, selected: true };
-    // onClick(newSelectedTarget);
   };
 
   const handleTargetDragEnd = (event, d) => {
@@ -144,7 +142,6 @@ export const useRadarComponent = ({
             startAngle: degrees,
             start: true,
           };
-          // dispatch(saveItem(saveItemStart));
           updateReduxAngles(degrees, section.index);
           setPositionCircle(saveItemStart, reference, true);
           if (typeof onDrag === 'function') {
@@ -157,7 +154,6 @@ export const useRadarComponent = ({
             endAngle: degrees,
             start: false,
           };
-          // dispatch(saveItem(saveItemEnd));
           updateReduxAngles(degrees, section.index, false);
           setPositionCircle(saveItemEnd, reference);
           if (typeof onDrag === 'function') {

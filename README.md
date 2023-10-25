@@ -6,11 +6,22 @@ example online: https://punteriacero.github.io/torta/
 
 ## More information about [radar-render](/radar-render/README.md)
 
-## Updating and Publishing Package to npm
+## Modifying, Updating and Publishing Package to npm
 
-This guide will walk you through the process of updating and publishing your package to the npm registry using Rollup.
+This guide will walk you through the process of modifying, updating and publishing your package to the npm registry using Rollup.
 
-### Step 1: Update Package Version
+### Step 1: Run webpack server locally
+
+If you want to modify directly the component or you need to verify something, you must run this command before you make/verify your changes.
+
+```sh
+cd radar-compoment
+npm run start
+```
+
+> Note: The above command run component and watch your changes inmediatly.
+
+### Step 2: Update Package Version
 
 **Option 1**
 
@@ -35,7 +46,7 @@ npm version <update_type>
 > - minor: for adding new features in a backwards-compatible manner.
 > - major: for making incompatible API changes.
 
-### Step 2: Build the Package
+### Step 3: Build the Package
 
 1. Open your terminal or command prompt.
 2. Run the build command:
@@ -46,7 +57,7 @@ npm run build
 
 > Note: This will bundle your code according to the configuration in `rollup.config.js.`
 
-### Step 3: Publish to npm
+### Step 4: Publish to npm
 
 1. Log in to your npm account (if not already logged in):
 
@@ -64,7 +75,7 @@ npm publish
 
 This will upload your package to the npm registry.
 
-### Step 4: Version Control
+### Step 5: Version Control
 1. Commit the changes to your version control system (e.g., Git):
 
 ```sh

@@ -9,7 +9,7 @@ export const data = {
       startElevation: 4,
       endElevation: 100,
       color: 'red',
-      selected: true,
+      selected: false,
       value: 10,
     },
 
@@ -22,7 +22,7 @@ export const data = {
       startElevation: 4,
       endElevation: 1,
       color: 'gray',
-      selected: false,
+      selected: true,
       value: 10,
     },
 

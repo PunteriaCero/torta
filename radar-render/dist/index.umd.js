@@ -269,7 +269,6 @@
       var newSection = newSectionsData.find(function (section) {
         return section.selected === true;
       });
-      resetCircles(newSectionsData);
       setSections(function (prevState) {
         onClick(newSection);
         return newSectionsData;
@@ -277,6 +276,7 @@
       var referencesClass = generateReferencesDOM(section.data);
       var drag = addEventDragCircles(section, newSection, referencesClass);
       setTimeout(function () {
+        resetCircles(newSectionsData);
         addCirclesSVG(section.data, drag, referencesClass);
       }, 0);
     };
@@ -288,10 +288,7 @@
         setSections(newSectionsData);
       }
       settTargets(newTargetsData);
-      // const newSelectedTarget = { ...d.data, selected: true };
-      // onClick(newSelectedTarget);
     };
-
     var handleTargetDragEnd = function handleTargetDragEnd(event, d) {
       var rad = Math.atan2(event.y, event.x);
       var degrees = rad * (180 / Math.PI) + 90;
@@ -331,7 +328,6 @@
             startAngle: degrees,
             start: true
           });
-          // dispatch(saveItem(saveItemStart));
           updateReduxAngles(degrees, section.index);
           setPositionCircle(saveItemStart, reference, true);
           if (typeof onDrag === 'function') {
@@ -343,7 +339,6 @@
             endAngle: degrees,
             start: false
           });
-          // dispatch(saveItem(saveItemEnd));
           updateReduxAngles(degrees, section.index, false);
           setPositionCircle(saveItemEnd, reference);
           if (typeof onDrag === 'function') {
@@ -662,6 +657,25 @@
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialConfig]);
+    React.useEffect(function () {
+      var timeout = setTimeout(function () {
+        var isExecuted = false;
+        if (!isExecuted) {
+          var existSelected = sections.find(function (item) {
+            return item.selected === true;
+          });
+          var circleElement = d3__namespace.select("#section-".concat(existSelected === null || existSelected === void 0 ? void 0 : existSelected.label)).node();
+          if (circleElement) {
+            d3__namespace.select(circleElement).dispatch('click');
+          }
+          isExecuted = true;
+        }
+      }, 0);
+      return function () {
+        return clearTimeout(timeout);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     return /*#__PURE__*/React__default["default"].createElement(React__default["default"].Fragment, null, /*#__PURE__*/React__default["default"].createElement("div", {
       style: styles.body,
       id: "chart"
