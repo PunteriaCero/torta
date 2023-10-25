@@ -287,6 +287,28 @@ function RadarComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialConfig]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      let isExecuted = false;
+
+      if (!isExecuted) {
+        const existSelected = sections.find((item) => item.selected === true);
+
+        const circleElement = d3
+          .select(`#section-${existSelected?.label}`)
+          .node();
+
+        if (circleElement) {
+          d3.select(circleElement).dispatch('click');
+        }
+        isExecuted = true;
+      }
+    }, 0);
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <div style={styles.body} id="chart">
