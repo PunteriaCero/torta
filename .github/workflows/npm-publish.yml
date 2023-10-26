@@ -32,6 +32,6 @@ jobs:
       - working-directory: ./radar-render
         run: npm ci
       - working-directory: ./radar-render
-        run: npm publish
+        run: npm publish --new-version ${{github.event.release.tag_name}}
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
