@@ -16,8 +16,9 @@ jobs:
         with:
           node-version: 16
       - working-directory: ./radar-render
-      - run: npm ci
-      - run: npm test
+        run: npm ci
+      - working-directory: ./radar-render
+        run: npm test
 
   publish-npm:
     needs: build
@@ -29,7 +30,8 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - working-directory: ./radar-render
-      - run: npm ci
-      - run: npm publish
+        run: npm ci
+      - working-directory: ./radar-render
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
