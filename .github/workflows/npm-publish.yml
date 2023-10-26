@@ -8,20 +8,7 @@ on:
     types: [created]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - working-directory: ./radar-render
-        run: npm ci
-      #- working-directory: ./radar-render
-      #  run: npm test
-
   publish-npm:
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,8 +17,10 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - working-directory: ./radar-render
+        run: npm version ${{github.event.release.tag_name}}
+      - working-directory: ./radar-render
         run: npm ci
       - working-directory: ./radar-render
-        run: npm publish --new-version ${{github.event.release.tag_name}}
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
