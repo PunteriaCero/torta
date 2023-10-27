@@ -58,7 +58,7 @@ function App() {
           sections={sectionsData}
           setSections={setSectionsData}
           targets={targetsData}
-          settTargets={setTargetsData}
+          setTargets={setTargetsData}
           showSections={showSections}
           onClick={onClick}
           onDrag={(updatedValue) => {

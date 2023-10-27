@@ -29,7 +29,7 @@ example online: https://punteriacero.github.io/torta/
 - `sections`: State variables are used to store and manage data that can change over time, this containing the necessary information for the visualization.
 - `setSections`: State setter function that is used to update the value of a state variable named sectionsData.
 - `targets`: State variables are used to store and manage data that can change over time, this containing the necessary information for the visualization.
-- `settTargets`: State setter function that is used to update the value of a state variable named targetsData.
+- `setTargets`: State setter function that is used to update the value of a state variable named targetsData.
 - `showSections`: Boolean that valid if show section or target.
 - `onClick`: A click event handler function called when a section or point is clicked.
 - `onDrag`: A drag event handler function called when a section or point is dragged.
@@ -120,7 +120,7 @@ Examples:
 ```js
 const [showSections, setShowSections] = useState(true);
 const [sectionsData, setSectionsData] = useState(sections);
-const [targetsData, settTargetsData] = useState(targets);
+const [targetsData, setTargetsData] = useState(targets);
 const [currentData, setCurrentData] = useState(data); // data contains the object {sections:[], targets: []}
 const [selectedRow, setSelectedRow] = useState(
   data.sections.find((section) => section.selected) ?? data.sections[0]
@@ -203,7 +203,7 @@ import { RadarComponent } from 'radar-render';
 function App() {
   const [showSections, setShowSections] = useState(true);
   const [sectionsData, setSectionsData] = useState(data.sections);
-  const [targetsData, settTargetsData] = useState(data.targets);
+  const [targetsData, setTargetsData] = useState(data.targets);
   const [selectedRow, setSelectedRow] = useState(
     data.sections.find((section) => section.selected) ?? data.sections[0]
   );
@@ -251,7 +251,7 @@ function App() {
           sections={sectionsData}
           setSections={setSectionsData}
           targets={targetsData}
-          settTargets={settTargetsData}
+          setTargets={setTargetsData}
           showSections={showSections}
           onClick={onClick}
           onDrag={(updatedValue) => {

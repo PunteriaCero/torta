@@ -364,7 +364,7 @@ RadarComponent.propTypes = {
       selected: PropTypes.bool.isRequired,
     })
   ).isRequired,
-  settTargets: PropTypes.func,
+  setTargets: PropTypes.func,
   showSections: PropTypes.bool,
   onClick: PropTypes.func,
   onDrag: PropTypes.func,
