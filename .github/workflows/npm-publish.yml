@@ -24,10 +24,11 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      - name: Commit cambios
+      - name: Commit changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git checkout ${{github.sha}}
           git add .
           git commit -m "chore(release): bump version to ${{github.event.release.tag_name}}"
-          git push
+          git push origin HEAD:${{github.ref}}
