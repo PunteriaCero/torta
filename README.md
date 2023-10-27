@@ -15,7 +15,7 @@ This guide will walk you through the process of modifying, updating and publishi
 If you want to modify directly the component or you need to verify something, you must run this command before you make/verify your changes.
 
 ```sh
-cd radar-compoment
+cd radar-render
 npm run start
 ```
 
@@ -36,7 +36,7 @@ npm run start
 1. Open your terminal and go to the package location and follow these commands.
 
 ```sh
-cd radar-compoment
+cd radar-render
 npm version <update_type>
 ```
 

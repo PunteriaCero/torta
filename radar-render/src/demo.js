@@ -1,21 +1,24 @@
-import React, { useState } from 'react'; 
-import { data, dataDos } from './data/index.js';
+import React, { useState } from 'react';
+import { data } from './data/index.js';
 import RadarComponent from './components/RadarComponent.js';
+import Button from '@mui/material/Button';
 import './styles.css';
 
 import { createRoot } from 'react-dom/client';
+import DataTable from './components/DataTable.js';
+import Slider from './components/RangeSlider.js';
 const container = document.getElementById('root');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript
-root.render(<App/>);
+root.render(<App />);
 
 function App() {
   const [showSections, setShowSections] = useState(true);
   const [sectionsData, setSectionsData] = useState(data.sections);
-  const [targetsData, settTargetsData] = useState(data.targets);
+  const [targetsData, setTargetsData] = useState(data.targets);
   const [selectedRow, setSelectedRow] = useState(
     data.sections.find((section) => section.selected) ?? data.sections[0]
   );
-  const [currentData, setCurrentData] = useState(data);
+  const [currentData, setCurrentData] = useState(data.sections);
   const onClick = (row) => {
     setSelectedRow(row);
   };
@@ -23,22 +26,45 @@ function App() {
   return (
     <div className="App">
       <div className="container">
-        <div className="btnContainer">
-          <button
+        <div className="tableContainer">
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: 'black',
+              width: '100%',
+              position: 'relative',
+              top: '18px',
+            }}
             onClick={() => {
-              setCurrentData(currentData.sections.length ? dataDos : data);
+              setCurrentData(currentData.length ? [] : data.sections);
               setShowSections(!showSections);
             }}
           >
             Change Mode
-          </button>
+          </Button>
+          <DataTable
+            showSections={showSections}
+            targets={targetsData}
+            sections={sectionsData}
+            selectedRow={selectedRow}
+          />
+          <div>
+            {showSections ? (
+              <Slider
+                key={JSON.stringify(selectedRow)}
+                selectedRow={selectedRow}
+                sections={sectionsData}
+                setSections={setSectionsData}
+              />
+            ) : null}
+          </div>
         </div>
         <RadarComponent
           key={JSON.stringify(currentData)}
           sections={sectionsData}
           setSections={setSectionsData}
           targets={targetsData}
-          settTargets={settTargetsData}
+          setTargets={setTargetsData}
           showSections={showSections}
           onClick={onClick}
           onDrag={(updatedValue) => {
@@ -54,6 +80,4 @@ function App() {
       </div>
     </div>
   );
-} 
-
-
+}

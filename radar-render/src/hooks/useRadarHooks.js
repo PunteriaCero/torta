@@ -10,7 +10,7 @@ export const useRadarComponent = ({
   sections,
   setSections,
   targets,
-  settTargets,
+  setTargets,
   onClick,
   onDrag,
   config: {
@@ -76,7 +76,7 @@ export const useRadarComponent = ({
     let newSection = newSectionsData.find(
       (section) => section.selected === true
     );
-    setSections((prevState) => {
+    setSections(() => {
       onClick(newSection);
       return newSectionsData;
     });
@@ -88,14 +88,16 @@ export const useRadarComponent = ({
     }, 0);
   };
 
-  const handleTargetsClick = (event, d) => {
+  const handleTargetsClick = (event, target) => {
     event.stopPropagation();
-    const newTargetsData = updateSelectedState(targets, d.data.label);
-    if (sections) {
-      const newSectionsData = updateSelectedState(sections, null); // Unselect all sections
-      setSections(newSectionsData);
-    }
-    settTargets(newTargetsData);
+    const newTargetsData = updateSelectedState(targets, target.index);
+    let newTarget = newTargetsData.find((target) => target.selected === true);
+    setTargets(() => {
+      onClick(newTarget);
+      return newTargetsData;
+    });
+
+    addEventDragTargets(target.index);
   };
 
   const handleTargetDragEnd = (event, d) => {
@@ -110,11 +112,13 @@ export const useRadarComponent = ({
     const newTargets = targets.map((target, index) => {
       return {
         ...target,
+        selected: index === d.index,
         angle: index === d.index ? degrees : target.angle,
         radius: index === d.index ? radius : target.radius,
       };
     });
-    settTargets(newTargets);
+    setTargets(newTargets);
+    addEventDragTargets(d.index);
   };
 
   const addEventDragCircles = (section, newSection, reference) => {
@@ -165,6 +169,15 @@ export const useRadarComponent = ({
     return drag;
   };
 
+  const addEventDragTargets = (index) => {
+    const timeout = setTimeout(() => {
+      const testElement = d3.select(`#target-${index}`);
+      testElement.call(d3.drag().on('end', handleTargetDragEnd));
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  };
+
   const resetCircles = (data) => {
     data.forEach((item) => {
       if (!item.selected) {
@@ -208,7 +221,6 @@ export const useRadarComponent = ({
   return {
     handleSectionClick,
     handleTargetsClick,
-    handleTargetDragEnd,
     width,
     height,
     radius,

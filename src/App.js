@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import './App.css';
 import { DataTable, Slider } from './components';
-import { data, dataDos } from './data';
+import { data } from './data';
 import Button from '@mui/material/Button';
 import { RadarComponent } from 'radar-render';
 
 function App() {
   const [showSections, setShowSections] = useState(true);
   const [sectionsData, setSectionsData] = useState(data.sections);
-  const [targetsData, settTargetsData] = useState(data.targets);
+  const [targetsData, setTargetsData] = useState(data.targets);
   const [selectedRow, setSelectedRow] = useState(
     data.sections.find((section) => section.selected) ?? data.sections[0]
   );
-  const [currentData, setCurrentData] = useState(data);
+  const [currentData, setCurrentData] = useState(data.sections);
   const onClick = (row) => {
     setSelectedRow(row);
   };
@@ -30,7 +30,7 @@ function App() {
               top: '18px',
             }}
             onClick={() => {
-              setCurrentData(currentData.sections.length ? dataDos : data);
+              setCurrentData(currentData.length ? [] : data.sections);
               setShowSections(!showSections);
             }}
           >
@@ -42,13 +42,15 @@ function App() {
             sections={sectionsData}
             selectedRow={selectedRow}
           />
-          <div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
-            <Slider
-              key={JSON.stringify(selectedRow)}
-              selectedRow={selectedRow}
-              sections={sectionsData}
-              setSections={setSectionsData}
-            />
+          <div>
+            {showSections ? (
+              <Slider
+                key={JSON.stringify(selectedRow)}
+                selectedRow={selectedRow}
+                sections={sectionsData}
+                setSections={setSectionsData}
+              />
+            ) : null}
           </div>
         </div>
         <RadarComponent
@@ -56,7 +58,7 @@ function App() {
           sections={sectionsData}
           setSections={setSectionsData}
           targets={targetsData}
-          settTargets={settTargetsData}
+          setTargets={setTargetsData}
           showSections={showSections}
           onClick={onClick}
           onDrag={(updatedValue) => {
