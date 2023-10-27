@@ -16,19 +16,20 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - working-directory: ./radar-render
-        run: npm version ${{github.event.release.tag_name}}
-      - working-directory: ./radar-render
+      - name: Bump Version
+        working-directory: ./radar-render
+        run: |
+          npm version ${{github.event.release.tag_name}}
+          git commit --amend --message "Nuevo mensaje del commit"
+          git push --force
+      - name: Install Dependencies
+        working-directory: ./radar-render
         run: npm ci
-      - working-directory: ./radar-render
+      - name: Build
+        working-directory: ./radar-render
+        run: npm run build
+      - name: Publish Package
+        working-directory: ./radar-render
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      - name: Commit changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git checkout ${{github.sha}}
-          git add .
-          git commit -m "chore(release): bump version to ${{github.event.release.tag_name}}"
-          git push origin HEAD:${{github.ref}}
