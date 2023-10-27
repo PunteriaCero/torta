@@ -8,7 +8,7 @@ function RadarComponent({
   sections,
   setSections,
   targets,
-  settTargets,
+  setTargets,
   showSections,
   onClick,
   onDrag,
@@ -19,7 +19,7 @@ function RadarComponent({
     sections,
     setSections,
     targets,
-    settTargets,
+    setTargets,
     onClick,
     onDrag,
     config,
@@ -41,7 +41,6 @@ function RadarComponent({
     const {
       handleSectionClick,
       handleTargetsClick,
-      handleTargetDragEnd,
       width,
       height,
       radius,
@@ -128,7 +127,7 @@ function RadarComponent({
         .data(pie(sections))
         .enter()
         .append('g')
-        .attr('id', (d) => `section-${d.data.label}`)
+        .attr('id', (d) => `section-${d.index}`)
         .on('click', handleSectionClick);
 
       // Define an arc generator for the sections
@@ -223,7 +222,9 @@ function RadarComponent({
         .selectAll('.arc')
         .data(pie(targets))
         .enter()
-        .append('g');
+        .append('g')
+        .attr('id', (d) => `target-${d.index}`)
+        .on('click', handleTargetsClick);
 
       // Add path elements to points
       point
@@ -276,8 +277,8 @@ function RadarComponent({
         .style('font-weight', pointLabelFontWeight)
         .style('cursor', 'pointer')
         .style('fill', pointLabelTextColor);
-      point.on('click', handleTargetsClick);
-      point.call(d3.drag().on('end', handleTargetDragEnd));
+      // point.on('click', handleTargetsClick);
+      //point.call(d3.drag().on('end', handleTargetDragEnd));
     }
 
     // Cleanup function to remove all elements from the SVG when unmounting the component
@@ -291,12 +292,23 @@ function RadarComponent({
     const timeout = setTimeout(() => {
       let isExecuted = false;
 
-      if (!isExecuted) {
-        const existSelected = sections.find((item) => item.selected === true);
+      if (!isExecuted && showSections) {
+        const selectedSection = sections.findIndex(
+          (item) => item.selected === true
+        );
 
-        const circleElement = d3
-          .select(`#section-${existSelected?.label}`)
-          .node();
+        const circleElement = d3.select(`#section-${selectedSection}`).node();
+
+        if (circleElement) {
+          d3.select(circleElement).dispatch('click');
+        }
+        isExecuted = true;
+      } else if (!isExecuted && !showSections) {
+        const selectedTarget = targets.findIndex(
+          (item) => item.selected === true
+        );
+        console.log(selectedTarget);
+        const circleElement = d3.select(`#target-${selectedTarget}`).node();
 
         if (circleElement) {
           d3.select(circleElement).dispatch('click');

@@ -548,4 +548,4 @@ export default function MinimumDistanceSlider({
 }
 ```
 
-> Note: with this function you can change the slider and affect the radar component Radar and update the angles and radius of the selected row.
+> Note: with this function you can change the slider and affect the radar component and update the angles and radius of the selected row.
