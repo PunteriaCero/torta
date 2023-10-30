@@ -30,18 +30,16 @@ jobs:
         uses: actions/configure-pages@v3
 
       - name: Install Dependencies
-        working-directory: ./radar-render
         run: npm ci
 
       - name: Build Demo
-        working-directory: ./radar-render  # Set the working directory to radar-render
         run: npm run build-demo  # Use the build script defined in your package.json
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './radar-render/dist/.'
+          path: './dist/.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1

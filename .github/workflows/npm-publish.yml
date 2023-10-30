@@ -17,16 +17,15 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - name: Bump Version
-        working-directory: ./radar-render
         run: npm version ${{github.event.release.tag_name}}
+
       - name: Install Dependencies
-        working-directory: ./radar-render
         run: npm ci
+
       - name: Build
-        working-directory: ./radar-render
         run: npm run build
+
       - name: Publish Package
-        working-directory: ./radar-render
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
