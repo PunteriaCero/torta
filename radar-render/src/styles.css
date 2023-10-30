@@ -1,23 +1,6 @@
 body {
   background-color: rgb(78, 78, 78);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  height: 96vh; /* Sets the container to 100% of the viewport height */
-}
-
-.container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 2rem;
-  background-color: rgb(63, 63, 63);
-  gap: 5rem;
-  /* width: 100%; */
-  padding: 2rem;
-  border-radius: 10px;
-}
+ }
 
 .tableContainer {
   background-color: rgba(0, 0, 0, 0.274);

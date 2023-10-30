@@ -7,6 +7,7 @@ import './styles.css';
 import { createRoot } from 'react-dom/client';
 import DataTable from './components/DataTable.js';
 import Slider from './components/RangeSlider.js';
+import { Container } from '@mui/material';
 const container = document.getElementById('root');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript
 root.render(<App />);
@@ -25,7 +26,14 @@ function App() {
 
   return (
     <div className="App">
-      <div className="container">
+      <Container
+        maxWidth="xl"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+        }}
+      >
         <div className="tableContainer">
           <Button
             variant="contained"
@@ -77,7 +85,7 @@ function App() {
             strokeCircles: 2,
           }}
         />
-      </div>
+      </Container>
     </div>
   );
 }
