@@ -6,11 +6,6 @@ name: Node.js Package
 on:
   release:
     types: [created]
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 jobs:
   publish-npm:
@@ -21,6 +16,12 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+          
+      - name: Set Global Git Config
+        run: |
+          git config --global user.email "mikebizne@gmail.com"
+          git config --global user.name "Michael Keb"
+          
       - name: Bump Version
         run: npm version ${{github.event.release.tag_name}}
 
