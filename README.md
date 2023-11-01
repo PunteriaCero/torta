@@ -32,16 +32,80 @@ example online: https://punteriacero.github.io/torta/
 - `setTargets`: State setter function that is used to update the value of a state variable named targetsData.
 - `showSections`: Boolean that valid if show section or target.
 - `onClick`: A click event handler function called when a section or point is clicked.
-- `onDrag`: A drag event handler function called when a section or point is dragged.
+
+````js
+  const onClick = (row) => {
+    setSelectedRow(row);
+    /*
+    updatedValue contians the value (object with):
+    if is section then return this:
+    {
+      "label": "3",
+      "startAngle": 74,
+      "endAngle": 150,
+      "innerRadius": 0.3,
+      "outerRadius": 1,
+      "startElevation": 4,
+      "endElevation": 2,
+      "color": "orange",
+      "selected": true, <--
+      "value": 10,
+      "start": true
+    }
+
+     if is target then return this:
+    {
+      "label": "1",
+      "angle": 340,
+      "radius": 0.3,
+      "elevation": 5,
+      "color": "orange",
+      "selected": true <--
+    }
+    */
+
+  };
+  ...
+  ...
+
+  onClick={onClick}
+````
+> In this example, the value is used to update and select the item information in the table.
+
+- `onDrag`: A drag event handler function called when a **section** is dragged. If you drag start or end circles, the value of the angle will change automatically. You can use this value to update your state.
+````js
+  onDrag={(updatedValue) => { 
+    setSelectedRow(updatedValue);
+    /*
+    updatedValue contians the value (object with):
+    {
+      "label": "3",
+      "startAngle": 74,<--- 
+      "endAngle": 150, <---
+      "innerRadius": 0.3,
+      "outerRadius": 1,
+      "startElevation": 4,
+      "endElevation": 2,
+      "color": "orange",
+      "selected": true,
+      "value": 10,
+      "start": true
+    }
+    */
+  }}
+````
+> In this example, the value is used to update the information in the table.
 - `config`: Style config in object.
   configuration required: - radius - colorCircles - strokeLines - strokeCircles
 
-      config={{
-            radius: '280',
-            colorCircles: 'rgb(0, 189, 88)',
-            strokeLines: 2,
-            strokeCircles: 2,
-          }}
+````js
+  config={{
+        radius: '280',
+        colorCircles: 'rgb(0, 189, 88)',
+        strokeLines: 2,
+        strokeCircles: 2,
+      }}
+````
 
 <a id="config-properties"></a>
 
@@ -125,7 +189,7 @@ const [currentData, setCurrentData] = useState(data); // data contains the objec
 const [selectedRow, setSelectedRow] = useState(
   data.sections.find((section) => section.selected) ?? data.sections[0]
 ); //set the first selected row from array objects
-```
+````
 
 > Note: sections and targets are array objects, it must be defined wiht this properties [Available Data Properties](#config-properties)
 
@@ -148,7 +212,7 @@ import {
   onClick={onClick} // return the object that was clicked
   onDrag={(updatedValue) => {
     // return the object that was dragged
-    setSelectedRow(updatedValue); // set the selected to use in any compoent such as data table or slider
+    setSelectedRow(updatedValue); // set the selected to use in any component such as data table or slider
   }}
   config={{
     radius: '280',
@@ -164,32 +228,40 @@ import {
 1. **Datatable**: Update the row selected in the useState then you can use this state in Datatable component, for example:
 
 ```js
- const onClick = (row) => {
-    setSelectedRow(row);
-  };
+const onClick = (row) => {
+  setSelectedRow(row);
+};
 ...
-   <DataTable
-            showSections={showSections} // show all sections or targets, depends on state attribute
-            targets={targetsData}// pass target data
-            sections={sectionsData} // pass sections data
-            selectedRow={selectedRow} // pass selected row
-          />
+<DataTable
+  showSections={showSections} // show all sections or targets, depends on state attribute
+  targets={targetsData}// pass target data
+  sections={sectionsData} // pass sections data
+  selectedRow={selectedRow} // pass selected row
+/>
 ```
 
 2. **Slider**: Update the row selected in the useState then you can use this state in Slider component, and show this component if it `showSections` is true, for example:
 
 ```js
-<div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
-  <Slider
-    key={JSON.stringify(selectedRow)}
-    sections={sectionsData} // pass sections data
-    setSections={setSectionsData} 
-    selectedRow={selectedRow} // pass selected row
-  />
+
+ <div>
+  {showSections ? (
+    <Slider
+      key={JSON.stringify(selectedRow)}
+      sections={sectionsData} // pass sections data
+      setSections={setSectionsData}
+      selectedRow={selectedRow} // pass selected row
+    />
+  ) : null}
 </div>
 ```
 
 ## Demo
+
+### Data with sections and targets
+
+[Download data.json](https://raw.githubusercontent.com/PunteriaCero/torta/main/src/data/index.js)
+
 ### App.js
 
 ```js
@@ -199,6 +271,7 @@ import { DataTable, Slider } from './components';
 import { data, dataDos } from './data';
 import Button from '@mui/material/Button';
 import { RadarComponent } from 'radar-render';
+import { Grid } from '@mui/material';
 
 function App() {
   const [showSections, setShowSections] = useState(true);
@@ -207,14 +280,23 @@ function App() {
   const [selectedRow, setSelectedRow] = useState(
     data.sections.find((section) => section.selected) ?? data.sections[0]
   );
-  const [currentData, setCurrentData] = useState(data);
+  const [currentData, setCurrentData] = useState(data.sections);
+  
   const onClick = (row) => {
     setSelectedRow(row);
   };
 
   return (
-    <div className="App">
-      <div className="container">
+    <Grid
+      container
+      spacing={2}
+      padding={0}
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      sx={{ minHeight: '96vh' }}
+    >
+      <Grid item xs={6}>
         <div className="tableContainer">
           <Button
             variant="contained"
@@ -225,7 +307,7 @@ function App() {
               top: '18px',
             }}
             onClick={() => {
-              setCurrentData(currentData.sections.length ? dataDos : data);
+              setCurrentData(currentData.length ? [] : data.sections);
               setShowSections(!showSections);
             }}
           >
@@ -237,15 +319,20 @@ function App() {
             sections={sectionsData}
             selectedRow={selectedRow}
           />
-          <div style={{ visibility: showSections ? 'visible' : 'hidden' }}>
-            <Slider
-              key={JSON.stringify(selectedRow)}
-              selectedRow={selectedRow}
-              sections={sectionsData}
-              setSections={setSectionsData}
-            />
+          <div>
+            {showSections ? (
+              <Slider
+                key={JSON.stringify(selectedRow)}
+                selectedRow={selectedRow}
+                sections={sectionsData}
+                setSections={setSectionsData}
+              />
+            ) : null}
           </div>
         </div>
+      </Grid>
+      <Grid item xs="auto"></Grid>
+      <Grid item xs={5}>
         <RadarComponent
           key={JSON.stringify(currentData)}
           sections={sectionsData}
@@ -264,14 +351,15 @@ function App() {
             strokeCircles: 2,
           }}
         />
-      </div>
-    </div>
+      </Grid>
+    </Grid>
   );
 }
 export default App;
 ```
 
 ### DataTable.js
+
 ```js
 import React from 'react';
 import { styled } from '@mui/material/styles';
@@ -312,7 +400,7 @@ export default function CustomizedTables({
   return (
     <TableContainer component={Paper}>
       <Table
-        sx={{ minWidth: 700 }}
+        sx={{ minWidth: 650 }}
         style={{ backgroundColor: 'rgb(37, 36, 36)', borderRadius: '10px' }}
         aria-label="customized table"
       >
@@ -320,17 +408,27 @@ export default function CustomizedTables({
           {
             showSections ? (
               <TableRow>
-                <StyledTableCell align="center">Label</StyledTableCell>
-                <StyledTableCell align="center">Start Angle</StyledTableCell>
-                <StyledTableCell align="center">End Angle</StyledTableCell>
-                <StyledTableCell align="center">Inner Radius</StyledTableCell>
-                <StyledTableCell align="center">Outer Radius</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Label
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Start Angle
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  End Angle
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Inner Radius
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Outer Radius
+                </StyledTableCell>
               </TableRow>
             ) : (
               <TableRow>
-                <StyledTableCell align="center">Label</StyledTableCell>
-                <StyledTableCell align="center">Angle</StyledTableCell>
-                <StyledTableCell align="center">Radius</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>Label</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>Angle</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>Radius</StyledTableCell>
               </TableRow>
             ) // Targets
           }
@@ -390,9 +488,10 @@ export default function CustomizedTables({
     </TableContainer>
   );
 }
-
 ```
+
 ### Slider.js
+
 ```js
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
@@ -425,13 +524,13 @@ export default function MinimumDistanceSlider({
     ]);
   }, [selectedRow]);
 
-/**
- * Handles changes in the values of a slider component.
- *
- * @param newValues - An array of new values for the slider start and end angle.
- * @param activeThumb - The index of the active thumb that indicate if  start or end angle is changing.
- * @param [isChangeRadius=false] - Indicates if the radius is cahnging or not.
- */
+  /**
+   * Handles changes in the values of a slider component.
+   *
+   * @param newValues - An array of new values for the slider start and end angle.
+   * @param activeThumb - The index of the active thumb that indicate if  start or end angle is changing.
+   * @param [isChangeRadius=false] - Indicates if the radius is cahnging or not.
+   */
   const onChange = (newValues, activeThumb, isChangeRadius = false) => {
     let [startAngle, endAngle, innerRadius, outerRadius] = newValues;
 
@@ -549,3 +648,82 @@ export default function MinimumDistanceSlider({
 ```
 
 > Note: with this function you can change the slider and affect the radar component and update the angles and radius of the selected row.
+
+## Modifying, Updating and Publishing Package to npm
+
+This guide will walk you through the process of modifying, updating and publishing your package to the npm registry using Rollup.
+
+### Step 1: Run webpack server locally
+
+If you want to modify directly the component or you need to verify something, you must run this command before you make/verify your changes.
+
+```sh
+cd radar-render
+npm run start
+```
+
+> Note: The above command run component and watch your changes inmediatly.
+
+### Step 2: Update Package Version
+
+**Option 1**
+
+1. Open your package.json file of your package (radar-render)
+2. Locate the version field.
+3. Update the version number according to semantic versioning.
+   - For example, you can use patch, minor, or major version bumps.
+4. Save the package.json file.
+
+**Option 2**
+
+1. Open your terminal and go to the package location and follow these commands.
+
+```sh
+cd radar-render
+npm version <update_type>
+```
+
+> Note: Replace <update_type> with one of the following options:
+>
+> - patch: for small, backwards-compatible bug fixes.
+> - minor: for adding new features in a backwards-compatible manner.
+> - major: for making incompatible API changes.
+
+### Step 3: Build the Package
+
+1. Open your terminal or command prompt.
+2. Run the build command:
+
+```sh
+npm run build
+```
+
+> Note: This will bundle your code according to the configuration in `rollup.config.js.`
+
+### Step 4: Publish to npm
+
+1. Log in to your npm account (if not already logged in):
+
+```sh
+npm login
+```
+
+Follow the prompts to log in.
+
+2. Publish your package:
+
+```sh
+npm publish
+```
+
+This will upload your package to the npm registry.
+
+### Step 5: Version Control
+
+1. Commit the changes to your version control system (e.g., Git):
+
+```sh
+git add .
+git commit -m "chore(release): bump version to X.Y.Z"
+git push
+```

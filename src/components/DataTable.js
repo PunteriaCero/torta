@@ -33,11 +33,11 @@ export default function CustomizedTables({
   sections,
   targets,
   selectedRow,
-}) { 
+}) {
   return (
     <TableContainer component={Paper}>
       <Table
-        sx={{ minWidth: 700 }}
+        sx={{ minWidth: 650 }}
         style={{ backgroundColor: 'rgb(37, 36, 36)', borderRadius: '10px' }}
         aria-label="customized table"
       >
@@ -45,17 +45,27 @@ export default function CustomizedTables({
           {
             showSections ? (
               <TableRow>
-                <StyledTableCell align="center">Label</StyledTableCell>
-                <StyledTableCell align="center">Start Angle</StyledTableCell>
-                <StyledTableCell align="center">End Angle</StyledTableCell>
-                <StyledTableCell align="center">Inner Radius</StyledTableCell>
-                <StyledTableCell align="center">Outer Radius</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Label
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Start Angle
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  End Angle
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Inner Radius
+                </StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>
+                  Outer Radius
+                </StyledTableCell>
               </TableRow>
             ) : (
               <TableRow>
-                <StyledTableCell align="center">Label</StyledTableCell>
-                <StyledTableCell align="center">Angle</StyledTableCell>
-                <StyledTableCell align="center">Radius</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>Label</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>Angle</StyledTableCell>
+                <StyledTableCell align="center" style={{ width: 50 }}>Radius</StyledTableCell>
               </TableRow>
             ) // Targets
           }
