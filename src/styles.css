@@ -21,7 +21,7 @@ code {
   justify-content: center;
   align-items: center;
   border-radius: 15px;
-  padding: 0.5rem;
+  padding: 0.5rem; 
 }
 
 circle.end-circle,
